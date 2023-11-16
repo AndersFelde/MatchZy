@@ -78,9 +78,10 @@ namespace MatchZy
 
         // SQLite Database 
         private Database database;
-    
-        public override void Load(bool hotReload) {
-            
+
+        public override void Load(bool hotReload)
+        {
+
             LoadAdmins();
 
             database = new Database();
@@ -89,9 +90,12 @@ namespace MatchZy
             // This sets default config ConVars
             Server.ExecuteCommand("execifexists MatchZy/config.cfg");
 
-            if (!hotReload) {
+            if (!hotReload)
+            {
                 StartWarmup();
-            } else {
+            }
+            else
+            {
                 // Pluign should not be reloaded while a match is live (this would messup with the match flags which were set)
                 // Only hot-reload the plugin if you are testing something and don't want to restart the server time and again.
                 UpdatePlayersMap();
@@ -122,15 +126,16 @@ namespace MatchZy
                 { ".stop", (player, commandInfo) => OnStopCommand(player, commandInfo) }
             };
 
-            RegisterEventHandler<EventPlayerConnectFull>((@event, info) => {
+            RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
+            {
                 Log($"[FULL CONNECT] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has connected!");
                 var player = @event.Userid;
 
                 // Handling whitelisted players
-                if(!player.IsBot) 
+                if (!player.IsBot)
                 {
                     var steamId = player.SteamID;
-            
+
                     string whitelistfileName = "MatchZy/whitelist.cfg";
                     string whitelistPath = Path.Join(Server.GameDirectory + "/csgo/cfg", whitelistfileName);
                     string? directoryPath = Path.GetDirectoryName(whitelistPath);
@@ -141,10 +146,10 @@ namespace MatchZy
                             Directory.CreateDirectory(directoryPath);
                         }
                     }
-                    if(!File.Exists(whitelistPath)) File.WriteAllLines(whitelistPath, new []{"Steamid1", "Steamid2"});
-            
+                    if (!File.Exists(whitelistPath)) File.WriteAllLines(whitelistPath, new[] { "Steamid1", "Steamid2" });
+
                     var whiteList = File.ReadAllLines(whitelistPath);
-        
+
                     if (isWhitelistRequired == true)
                     {
                         if (!whiteList.Contains(steamId.ToString()))
@@ -157,22 +162,28 @@ namespace MatchZy
                 }
 
                 player.PrintToChat($"{chatPrefix} Welcome to the server!");
-                if (@event.Userid.UserId.HasValue) {
-                    
+                if (@event.Userid.UserId.HasValue)
+                {
+
                     playerData[@event.Userid.UserId.Value] = @event.Userid;
                     connectedPlayers++;
-                    if (readyAvailable && !matchStarted) {
+                    if (readyAvailable && !matchStarted)
+                    {
                         playerReadyStatus[@event.Userid.UserId.Value] = false;
-                    } else {
+                    }
+                    else
+                    {
                         playerReadyStatus[@event.Userid.UserId.Value] = true;
                     }
                 }
                 // May not be required, but just to be on safe side so that player data is properly updated in dictionaries
                 UpdatePlayersMap();
 
-                if (readyAvailable && !matchStarted) {
+                if (readyAvailable && !matchStarted)
+                {
                     // Start Warmup when first player connect and match is not started.
-                    if (GetRealPlayersCount() == 1) {
+                    if (GetRealPlayersCount() == 1)
+                    {
                         Log($"[FULL CONNECT] First player has connected, starting warmup!");
                         StartWarmup();
                     }
@@ -180,14 +191,18 @@ namespace MatchZy
                 return HookResult.Continue;
             });
 
-            RegisterEventHandler<EventPlayerDisconnect>((@event, info) => {
+            RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
+            {
                 Log($"[EventPlayerDisconnect] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has disconnected!");
-                if (@event.Userid.UserId.HasValue) {
-                    if (playerReadyStatus.ContainsKey(@event.Userid.UserId.Value)) {
+                if (@event.Userid.UserId.HasValue)
+                {
+                    if (playerReadyStatus.ContainsKey(@event.Userid.UserId.Value))
+                    {
                         playerReadyStatus.Remove(@event.Userid.UserId.Value);
                         connectedPlayers--;
                     }
-                    if (playerData.ContainsKey(@event.Userid.UserId.Value)) {
+                    if (playerData.ContainsKey(@event.Userid.UserId.Value))
+                    {
                         playerData.Remove(@event.Userid.UserId.Value);
                     }
                 }
@@ -195,39 +210,49 @@ namespace MatchZy
                 return HookResult.Continue;
             });
 
-            RegisterListener<Listeners.OnClientDisconnectPost>(playerSlot => { 
-               // May not be required, but just to be on safe side so that player data is properly updated in dictionaries
+            RegisterListener<Listeners.OnClientDisconnectPost>(playerSlot =>
+            {
+                // May not be required, but just to be on safe side so that player data is properly updated in dictionaries
                 UpdatePlayersMap();
             });
 
-            RegisterEventHandler<EventCsWinPanelRound>((@event, info) => {
+            RegisterEventHandler<EventCsWinPanelRound>((@event, info) =>
+            {
                 Log($"[EventCsWinPanelRound PRE] finalEvent: {@event.FinalEvent}");
-                if (isKnifeRound && matchStarted) {
+                if (isKnifeRound && matchStarted)
+                {
                     HandleKnifeWinner(@event);
                 }
                 return HookResult.Continue;
             }, HookMode.Pre);
 
-            RegisterEventHandler<EventCsWinPanelMatch>((@event, info) => {
+            RegisterEventHandler<EventCsWinPanelMatch>((@event, info) =>
+            {
                 Log($"[EventCsWinPanelMatch]");
                 HandleMatchEnd();
                 // ResetMatch();
                 return HookResult.Continue;
             });
 
-           RegisterEventHandler<EventRoundStart>((@event, info) => {
+            RegisterEventHandler<EventRoundStart>((@event, info) =>
+            {
                 HandlePostRoundStartEvent(@event);
                 return HookResult.Continue;
             });
 
-            RegisterEventHandler<EventRoundEnd>((@event, info) => {
+            RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            {
                 Log($"[EventRoundEnd PRE] Winner: {@event.Winner}, Reason: {@event.Reason}");
-                if (isKnifeRound) {
+                if (isKnifeRound)
+                {
                     @event.Winner = knifeWinner;
                     int finalEvent = 10;
-                    if (knifeWinner == 3) {
+                    if (knifeWinner == 3)
+                    {
                         finalEvent = 8;
-                    } else if (knifeWinner == 2) {
+                    }
+                    else if (knifeWinner == 2)
+                    {
                         finalEvent = 9;
                     }
                     @event.Reason = finalEvent;
@@ -239,44 +264,51 @@ namespace MatchZy
                 return HookResult.Continue;
             }, HookMode.Pre);
 
-           RegisterEventHandler<EventRoundEnd>((@event, info) => {
+            RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            {
                 Log($"[EventRoundEnd POST] Winner: {@event.Winner}, Reason: {@event.Reason}");
                 HandlePostRoundEndEvent(@event);
                 return HookResult.Continue;
             }, HookMode.Post);
 
-            RegisterEventHandler<EventMapShutdown>((@event, info) => {
+            RegisterEventHandler<EventMapShutdown>((@event, info) =>
+            {
                 Log($"[EventMapShutdown] Resetting match!");
                 ResetMatch();
                 return HookResult.Continue;
             });
 
-            RegisterListener<Listeners.OnMapStart>(mapName => { 
+            RegisterListener<Listeners.OnMapStart>(mapName =>
+            {
                 Log($"[Listeners.OnMapStart] Resetting match!");
                 ResetMatch();
             });
 
-            RegisterListener<Listeners.OnMapEnd>(() => {
+            RegisterListener<Listeners.OnMapEnd>(() =>
+            {
                 Log($"[Listeners.OnMapEnd] Resetting match!");
                 ResetMatch();
             });
 
-            RegisterEventHandler<EventPlayerDeath>((@event, info) => {
+            RegisterEventHandler<EventPlayerDeath>((@event, info) =>
+            {
                 // Setting money back to 16000 when a player dies in warmup
                 var player = @event.Userid;
-                if (isWarmup) {
+                if (isWarmup)
+                {
                     if (player.InGameMoneyServices != null) player.InGameMoneyServices.Account = 16000;
                 }
                 return HookResult.Continue;
             });
 
             RegisterEventHandler<EventPlayerHurt>((@event, info) =>
-			{
-				CCSPlayerController attacker = @event.Attacker;
+            {
+                CCSPlayerController attacker = @event.Attacker;
 
-				if (!attacker.IsValid || attacker.IsBot && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))
-					return HookResult.Continue;
-                if (matchStarted) {
+                if (!attacker.IsValid || attacker.IsBot && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))
+                    return HookResult.Continue;
+                if (matchStarted)
+                {
                     if (@event.Userid.TeamNum != attacker.TeamNum)
                     {
                         int targetId = (int)@event.Userid.UserId!;
@@ -285,10 +317,11 @@ namespace MatchZy
                     }
                 }
 
-				return HookResult.Continue;
-			});
+                return HookResult.Continue;
+            });
 
-            RegisterEventHandler<EventPlayerChat>((@event, info) => {
+            RegisterEventHandler<EventPlayerChat>((@event, info) =>
+            {
 
                 int currentVersion = Api.GetVersion();
                 int index = @event.Userid;
@@ -305,90 +338,112 @@ namespace MatchZy
                 var message = @event.Text.Trim().ToLower();
 
                 CCSPlayerController? player = null;
-                if (playerData.ContainsKey(playerUserId)) {
+                if (playerData.ContainsKey(playerUserId))
+                {
                     player = playerData[playerUserId];
                 }
 
-                if (player == null) {
+                if (player == null)
+                {
                     // Somehow we did not had the player in playerData, hence updating the maps again before getting the player
                     UpdatePlayersMap();
                     player = playerData[playerUserId];
                 }
 
                 // Handling player commands
-                if (commandActions.ContainsKey(message)) {
+                if (commandActions.ContainsKey(message))
+                {
                     commandActions[message](player, null);
                 }
 
-                if (message.StartsWith(".map")) {
+                if (message.StartsWith(".map"))
+                {
                     string command = ".map";
                     string mapName = message.Substring(command.Length).Trim();
                     HandleMapChangeCommand(player, mapName);
                 }
-                if (message.StartsWith(".readyrequired")) {
+                if (message.StartsWith(".readyrequired"))
+                {
                     string command = ".readyrequired";
                     string commandArg = message.Substring(command.Length).Trim();
 
                     HandleReadyRequiredCommand(player, commandArg);
                 }
 
-                if (message.StartsWith(".restore")) {
+                if (message.StartsWith(".restore"))
+                {
                     string command = ".restore";
                     string commandArg = message.Substring(command.Length).Trim();
 
                     HandleRestoreCommand(player, commandArg);
                 }
-                if (originalMessage.StartsWith(".asay")) {
+                if (originalMessage.StartsWith(".asay"))
+                {
                     string command = ".asay";
                     string commandArg = originalMessage.Substring(command.Length).Trim();
 
-                    if (IsPlayerAdmin(player)) {
-                        if (commandArg != "") {
+                    if (IsPlayerAdmin(player))
+                    {
+                        if (commandArg != "")
+                        {
                             Server.PrintToChatAll($"[{ChatColors.Red}ADMIN{ChatColors.Default}] {commandArg}");
-                        } else {
+                        }
+                        else
+                        {
                             ReplyToUserCommand(player, "Usage: .asay <message>");
                         }
-                    } else {
+                    }
+                    else
+                    {
                         SendPlayerNotAdminMessage(player);
                     }
                 }
-                if (message.StartsWith(".spawn")) {
+                if (message.StartsWith(".spawn"))
+                {
                     string command = ".spawn";
                     string commandArg = message.Substring(command.Length).Trim();
 
                     HandleSpawnCommand(player, commandArg, player.TeamNum, "spawn");
                 }
-                if (message.StartsWith(".ctspawn")) {
+                if (message.StartsWith(".ctspawn"))
+                {
                     string command = ".ctspawn";
                     string commandArg = message.Substring(command.Length).Trim();
 
                     HandleSpawnCommand(player, commandArg, (byte)CsTeam.CounterTerrorist, "ctspawn");
                 }
-                if (message.StartsWith(".tspawn")) {
+                if (message.StartsWith(".tspawn"))
+                {
                     string command = ".tspawn";
                     string commandArg = message.Substring(command.Length).Trim();
 
                     HandleSpawnCommand(player, commandArg, (byte)CsTeam.Terrorist, "tspawn");
                 }
-                if (originalMessage.StartsWith(".team1")) {
+                if (originalMessage.StartsWith(".team1"))
+                {
                     string command = ".team1";
                     string commandArg = originalMessage.Substring(command.Length).Trim();
 
                     HandleTeamNameChangeCommand(player, commandArg, 1);
                 }
-                if (originalMessage.StartsWith(".team2")) {
+                if (originalMessage.StartsWith(".team2"))
+                {
                     string command = ".team2";
                     string commandArg = originalMessage.Substring(command.Length).Trim();
 
                     HandleTeamNameChangeCommand(player, commandArg, 2);
                 }
-                if (originalMessage.StartsWith(".rcon")) {
+                if (originalMessage.StartsWith(".rcon"))
+                {
                     string command = ".rcon";
                     string commandArg = originalMessage.Substring(command.Length).Trim();
-                    if (IsPlayerAdmin(player)) {
+                    if (IsPlayerAdmin(player))
+                    {
                         Server.ExecuteCommand(commandArg);
                         ReplyToUserCommand(player, "Command sent successfully!");
-                    } else {
+                    }
+                    else
+                    {
                         SendPlayerNotAdminMessage(player);
                     }
                 }
