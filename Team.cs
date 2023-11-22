@@ -9,9 +9,11 @@ namespace Get5
     public class Player
     {
         public CCSPlayerController? PlayerController { get; set; }
-        public string PlayerName { get; set; }
+
+        public bool IsReady { get; set; } = false;
+        public string Name { get; set; }
         private ulong _playerSteamID;
-        public ulong PlayerSteamID
+        public ulong SteamID
         {
             get { return _playerSteamID; }
             set
@@ -25,10 +27,24 @@ namespace Get5
         }
         public Player(string playerName, ulong playerSteamID, CCSPlayerController? playerController)
         {
-            this.PlayerName = playerName;
-            this.PlayerSteamID = playerSteamID;
+            this.Name = playerName;
+            this.SteamID = playerSteamID;
             this.PlayerController = playerController;
 
+        }
+
+        public void Ready()
+        {
+            ChatMessage.SendPlayerChatMessage(PlayerController, "You are now ready");
+            this.IsReady = true;
+            PlayerController.Clan = "[READY]";
+        }
+
+        public void UnReady()
+        {
+            ChatMessage.SendPlayerChatMessage(PlayerController, "You are not ready");
+            this.IsReady = false;
+            PlayerController.Clan = "[NOT READY]";
         }
     }
 
@@ -37,6 +53,7 @@ namespace Get5
         public string TeamName { get; set; }
         public string TeamFlag { get; set; }
         public string TeamTag { get; set; }
+        public bool IsPaused = false;
 
         public int Score = 0;
 
@@ -56,47 +73,79 @@ namespace Get5
 
         public bool HasPlayer(ulong steamID)
         {
-            return this.Players.Any(player => player.PlayerSteamID == steamID);
+            return this.Players.Any(player => player.SteamID == steamID);
         }
 
-        public Player? GetPlayer(ulong steamID)
+        public bool HasPlayer(CCSPlayerController player)
         {
-            return this.Players.Find(player => player.PlayerSteamID == steamID);
+            return this.Players.Any(player => player.SteamID == player.SteamID);
         }
 
-    }
-
-    public class ReverseTeam
-    {
-        public Team TERRORIST { get; set; }
-        public Team CT { get; set; }
-
-        public ReverseTeam(Team ct, Team terrorist)
+        public Player GetPlayer(ulong steamID)
         {
-            this.TERRORIST = terrorist;
-            this.CT = ct;
+            return this.Players.Find(player => player.SteamID == steamID) ?? throw new System.InvalidOperationException($"Player with SteamID {steamID} not found in team {this.TeamName}");
         }
-    }
 
-    public partial class MatchZy
-    {
-        // Todo: Organize Teams code which can be later used for setting up matches
-        public Team? Team1 { get; set; }
-        public Team? Team2 { get; set; }
-        private static Team LoadTeamFromJson(string teamName)
+        public Player GetPlayer(CCSPlayerController player)
         {
-            using (StreamReader r = new StreamReader($"{teamName}.json"))
+            return this.Players.Find(player => player.SteamID == player.SteamID) ?? throw new System.InvalidOperationException($"Player with SteamID {player.SteamID} not found in team {this.TeamName}");
+        }
+
+        public static Team LoadFromJson(string teamName)
+        {
+            string json = Utils.ReadConfigFile($"{teamName}.json");
+            return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamName}.json");
+        }
+
+        public void JoinPlayer(CCSPlayerController player)
+        {
+            GetPlayer(player.SteamID).PlayerController = player;
+        }
+
+        public void DisconnectPlayer(CCSPlayerController player)
+        {
+            var p = GetPlayer(player.SteamID);
+            p.PlayerController = null;
+            p.IsReady = false;
+        }
+
+        public int JoinedPlayers()
+        {
+            int joined = 0;
+            foreach (var player in Players)
             {
-                string json = r.ReadToEnd();
-                return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamName}.json");
+                if (player.PlayerController != null)
+                {
+                    joined++;
+                }
             }
+            return joined;
+        }
 
+        public int ReadyPlayers()
+        {
+            int ready = 0;
+            foreach (var player in Players)
+            {
+                if (player.IsReady)
+                {
+                    ready++;
+                }
+            }
+            return ready;
 
         }
-        public void LoadTeams(string teamName1, string teamName2)
+
+        public void Pause()
         {
-            this.Team1 = LoadTeamFromJson(teamName1);
-            this.Team2 = LoadTeamFromJson(teamName2);
+            ChatMessage.SendAllChatMessage($"{this.TeamName} has paused the game");
+            this.IsPaused = true;
+        }
+
+        public void UnPause()
+        {
+            ChatMessage.SendAllChatMessage($"{this.TeamName} wants to unpause the game");
+            this.IsPaused = false;
         }
 
     }

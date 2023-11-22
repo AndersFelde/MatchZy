@@ -24,6 +24,8 @@ namespace Get5
                 { "pick", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: false) },
                 { "stay", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: true) },
                 { "switch", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: false) },
+                { "ready", (player, commandArgs, liveMatch) => liveMatch.HandleReadyChat(player) },
+                { "unready", (player, commandArgs, liveMatch) => liveMatch.HandleUnReadyChat(player) },
             };
 
     }

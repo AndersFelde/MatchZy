@@ -75,6 +75,7 @@ namespace Get5
             }
             @event.FinalEvent = finalEvent;
             KnifeActive = false;
+            LiveMatch.EndKnifeRound();
 
         }
         public void HandleKnifeRoundChat(CCSPlayerController player, List<string> commandArgs, bool stay)

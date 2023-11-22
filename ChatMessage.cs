@@ -28,6 +28,10 @@ namespace Get5
         {
             player.PrintToChat($"{Get5.chatPrefix} {message}");
         }
+        public static void SendConsoleMessage(string message)
+        {
+            Console.WriteLine($"{Get5.chatPrefix} {message}");
+        }
     }
 
 }

@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Net;
 namespace Get5
 {
-    public class LiveMatch
+    public partial class LiveMatch
     {
 
         private bool IsLive = false;
@@ -22,18 +22,24 @@ namespace Get5
         private bool IsMapVote = true;
 
 
-        public Match Match { get; set; }
 
-        private ReverseTeam? ReverseTeam { get; set; }
+        private Get5 Get5 { get; set; }
+        public Match Match { get; set; }
 
         public MapVote MapVote { get; set; }
         public KnifeRound KnifeRound { get; set; }
 
-        public LiveMatch(Match match)
+        public DamageInfo DamageInfo { get; set; }
+
+        public LiveMatch(Match match, Get5 get5)
         {
+
             this.Match = match;
+            this.Get5 = get5;
             this.MapVote = new MapVote(mapList: this.Match.MapList, liveMatch: this);
             this.KnifeRound = new KnifeRound(this);
+            this.DamageInfo = new DamageInfo(this);
+            StartWarmup();
         }
         public (int alivePlayers, int totalHealth) GetAlivePlayers(bool terrorists = false, bool CT = false)
         {
@@ -62,37 +68,10 @@ namespace Get5
             return (count, totalHealth);
         }
 
-        public void ScoreUpdateHook(EventTeamScore @event)
-        {
-            if (IsLive)
-            {
-                Match.GetTeam(@event.Teamid)?.UpdateScore(@event.Score);
-            }
-        }
-
-        public void RoundEndHook(EventCsWinPanelRound @event)
-        {
-            if (IsLive)
-            {
-            }
-            else if (IsKnifeRound)
-            {
-                KnifeRound.HandleKnifeRoundEnd(@event);
-            }
-
-
-        }
-
-        public void PlayerConnectHook(EventPlayerConnectFull @event)
-        {
-            if (Match.CT.HasPlayer(@event.Userid.SteamID)){
-                
-            }
-
-        }
 
         public void StartWarmup()
         {
+            ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
             IsWarmup = true;
             Server.ExecuteCommand("exec warmup");
         }
@@ -105,6 +84,7 @@ namespace Get5
 
         public void StartMapVote()
         {
+            ChatMessage.SendAllChatMessage("Captains, prepare to vote for maps");
             IsMapVote = true;
             MapVote.VoteActive = true;
             Server.ExecuteCommand("sv_pausable 1");
@@ -122,6 +102,7 @@ namespace Get5
 
         public void StartKnifeRound()
         {
+            ChatMessage.SendAllChatMessage("Knife round is starting!");
             IsKnifeRound = true;
             KnifeRound.KnifeActive = true;
             Server.ExecuteCommand("exec knife");
@@ -143,14 +124,39 @@ namespace Get5
         public void StartLive()
         {
             IsLive = true;
+            DamageInfo.InitPlayerDamageInfo();
             Server.ExecuteCommand("exec live");
+            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
+            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
+            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
 
         }
-        public void StopLive()
+        public void EndLive()
         {
+            ChatMessage.SendAllChatMessage("Match ended");
+            ChatMessage.SendConsoleMessage($"Match ended {Match.CT.TeamName}: {Match.CT.Score} - {Match.Terrorists.TeamName}: {Match.Terrorists.Score}");
             IsLive = false;
-            Server.ExecuteCommand("exec live");
+            Get5.LiveMatch = null;
+        }
 
+        public void Pause()
+        {
+            if (!IsPaused)
+            {
+                IsPaused = true;
+                ChatMessage.SendAllChatMessage("Match will pause as soon as possible");
+                Server.ExecuteCommand("mp_pause_match");
+            }
+        }
+
+        public void UnPause()
+        {
+            if (!Match.CT.IsPaused && !Match.Terrorists.IsPaused)
+            {
+                IsPaused = false;
+                ChatMessage.SendAllChatMessage("Match unpaused");
+                Server.ExecuteCommand("mp_unpause_match");
+            }
         }
 
     }

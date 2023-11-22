@@ -30,78 +30,8 @@ namespace Get5
 
         private string chatCommandPrefix = ".";
 
-        private LiveMatch? LiveMatch { get; set; }
+        public LiveMatch? LiveMatch { get; set; }
 
-        public void StartMatch()
-        {
-            // TODO: definere command og greier
-        }
-        public override void Load(bool HotReload)
-        {
-            RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
-            {
-                Utils.Log($"[FULL CONNECT] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has connected!");
-                var player = @event.Userid;
-
-                // Handling whitelisted players
-                if (!player.IsBot)
-                {
-                    ChatMessage.SendAllChatMessage("Welcome to the server!");
-                    if (@event.Userid.UserId.HasValue)
-                    {
-
-                        playerData[@event.Userid.UserId.Value] = @event.Userid;
-                    }
-                }
-                LiveMatch?.PlayerConnectHook(@event);
-                return HookResult.Continue;
-            });
-
-            RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
-            {
-                Utils.Log($"[EventPlayerDisconnect] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has disconnected!");
-                if (@event.Userid.UserId.HasValue)
-                {
-                    playerData.Remove(@event.Userid.UserId.Value);
-                }
-
-                return HookResult.Continue;
-            });
-
-            RegisterEventHandler<EventCsWinPanelRound>((@event, info) =>
-            {
-                LiveMatch?.RoundEndHook(@event);
-                return HookResult.Continue;
-            }, HookMode.Pre);
-
-            RegisterEventHandler<EventPlayerChat>((@event, info) =>
-                {
-                    string message = @event.Text.Trim().ToLower();
-                    if (!message.StartsWith(this.chatCommandPrefix))
-                    {
-                        return HookResult.Continue;
-                    }
-
-                    int index = @event.Userid;
-                    // From APIVersion 50 and above, EventPlayerChat userid property will be a "slot", rather than an entity index 
-                    // Player index is slot + 1
-                    var playerUserId = NativeAPI.GetUseridFromIndex(index);
-                    Utils.Log($"[EventPlayerChat] UserId(Index): {index} playerUserId: {playerUserId} Message: {@event.Text}");
-
-
-                    List<string> commandArgs = @event.Text.Trim().ToLower().Replace(this.chatCommandPrefix, "").Split(" ").ToList();
-
-                    CCSPlayerController player = playerData[playerUserId];
-
-                    // Handling player commands
-                    if (ChatCommands.CommandActions.ContainsKey(commandArgs[0]) && this.LiveMatch != null)
-                    {
-                        ChatCommands.CommandActions[commandArgs[0]](player, commandArgs, this.LiveMatch);
-                    }
-
-                    return HookResult.Continue;
-                });
-        }
     }
 
 }

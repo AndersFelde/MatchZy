@@ -39,7 +39,7 @@ namespace Get5
             this.LiveMatch = liveMatch;
         }
 
-        public bool HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban)
+        public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban)
         {
             if (!this.VoteFinished)
             {
@@ -68,6 +68,7 @@ namespace Get5
                         {
                             VoteFinished = true;
                             ChatMessage.SendAllChatMessage("Vote is finished!");
+                            LiveMatch.EndMapVote();
                         }
 
 
@@ -89,7 +90,6 @@ namespace Get5
 
                 ChatMessage.SendPlayerChatMessage(player, "Vote is finished!");
             }
-            return VoteFinished;
 
         }
     }

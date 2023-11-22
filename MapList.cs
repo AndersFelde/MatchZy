@@ -2,6 +2,10 @@ namespace Get5
 {
     public class MapList
     {
+        public MapList(List<string>? maps = null)
+        {
+            this.maps = maps ?? new List<string>();
+        }
         public List<string> maps = new();
         public bool HasMap(string mapName)
         {

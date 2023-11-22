@@ -18,11 +18,12 @@ namespace Get5
         { 3, "CT" },
 
     };
+        public static string ConfigPath = Path.Join(Server.GameDirectory + "/csgo/cfg/get5/");
     }
     class StringChoiceField
     {
-        private string? _Value;
-        public string? Value
+        private string _Value = "";
+        public string Value
         {
             get { return _Value; }
             set
@@ -54,6 +55,16 @@ namespace Get5
         public static void Log(string message)
         {
             Console.WriteLine("[MatchZy] " + message);
+        }
+        public static string ReadConfigFile(string filename, bool json = true)
+        {
+            string data;
+            filename += json ? ".json" : "";
+            using (var r = new StreamReader(Globals.ConfigPath + filename))
+            {
+                data = r.ReadToEnd();
+            }
+            return data;
         }
 
     }

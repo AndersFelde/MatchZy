@@ -62,8 +62,8 @@ namespace Get5
         public MapList MapList { get; set; }
         public Match(string teamName1, string teamName2, string? matchTitle = null, int numMaps = 3, int MinPlayersToReady = 5, string voteFirst = "random", string mapSides = "knife", string voteMode = "team1_ban", MapList? mapList = null)
         {
-            this.Terrorists = this.Team1 = LoadTeamFromJson(teamName1);
-            this.CT = this.Team2 = LoadTeamFromJson(teamName2);
+            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1);
+            this.CT = this.Team2 = Team.LoadFromJson(teamName2);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = MinPlayersToReady;
@@ -72,17 +72,71 @@ namespace Get5
             this.VoteMode = voteMode;
             this.MapList = mapList ?? new MapList();
         }
-
-        private static Team LoadTeamFromJson(string teamName)
+        public static Match LoadFromJson(string match_name)
         {
-            using (StreamReader r = new StreamReader($"{teamName}.json"))
-            {
-                string json = r.ReadToEnd();
-                return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamName}.json");
-            }
+            string json = Utils.ReadConfigFile(match_name);
+            JsonElement jsonEl = JsonDocument.Parse(json).RootElement;
+            string teamName1 = jsonEl.GetProperty("teamName1").ToString();
 
+            string teamName2 = jsonEl.GetProperty("teamName2").ToString();
 
+            string? matchTitle = jsonEl.TryGetProperty("matchTitle", out JsonElement matchTitleElement)
+                ? matchTitleElement.ToString()
+                : null;
+
+            int numMaps = jsonEl.TryGetProperty("numMaps", out JsonElement numMapsElement)
+                ? numMapsElement.GetInt32()
+                : 3;
+
+            int minPlayersToReady = jsonEl.TryGetProperty("MinPlayersToReady", out JsonElement minPlayersToReadyElement)
+                ? minPlayersToReadyElement.GetInt32()
+                : 5;
+
+            string voteFirst = jsonEl.TryGetProperty("voteFirst", out JsonElement voteFirstElement)
+                ? voteFirstElement.ToString()
+                : "random";
+
+            string mapSides = jsonEl.TryGetProperty("mapSides", out JsonElement mapSidesElement)
+                ? mapSidesElement.ToString()
+                : "knife";
+
+            string voteMode = jsonEl.TryGetProperty("voteMode", out JsonElement voteModeElement)
+                ? voteModeElement.ToString()
+                : "team1_ban";
+
+            List<string> maps = jsonEl.GetProperty("mapList").EnumerateArray().Select(element => element.ToString()).ToList();
+            MapList mapList = new(maps);
+
+            return new Match(teamName1, teamName2, matchTitle, numMaps, minPlayersToReady, voteFirst, mapSides, voteMode, mapList);
         }
+
+        public List<Player> GetAllPlayers()
+        {
+            List<Player> players = new();
+            players.AddRange(this.Team1.Players);
+            players.AddRange(this.Team2.Players);
+            return players;
+        }
+        public List<Player> GetAllActivePlayers()
+        {
+            return GetAllPlayers().Where(player => player.PlayerController != null).ToList();
+        }
+
+        public Player? GetPlayer(CCSPlayerController player)
+        {
+            if (this.Team1.HasPlayer(player))
+            {
+                return this.Team1.GetPlayer(player);
+            }
+            else if (this.Team2.HasPlayer(player))
+            {
+                return this.Team2.GetPlayer(player);
+            }
+            return null;
+        }
+
+
+
         public Team? GetTeam(int teamNum)
         {
 
@@ -96,6 +150,16 @@ namespace Get5
             }
             return null;
         }
+
+        public Team? GetTeam(CCSPlayerController player)
+        {
+
+            int teamNum = player.TeamNum;
+            return GetTeam(teamNum);
+        }
+
+
+
     }
 
 }
