@@ -18,9 +18,10 @@ namespace Get5
     class ChatCommands
     {
 
-        static public Dictionary<string, Action<CCSPlayerController, List<string>>>? CommandActions = new Dictionary<string, Action<CCSPlayerController, List<string>>> {
-                { ".ban", (player, commandArgs) => LiveMatch.HandleMapVoteChat(player, commandArgs) },
-                { ".pick", (player, commandArgs) => LiveMatch.HandleMapVoteChat(player, commandArgs) },
+        static public Dictionary<string, Action<CCSPlayerController, List<string>, LiveMatch>> CommandActions = new()
+        {
+                { "ban", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: true) },
+                { "pick", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, pick: true) },
             };
 
     }

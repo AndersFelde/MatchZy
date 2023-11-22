@@ -14,9 +14,8 @@ namespace Get5
         public int NumMaps { get; set; }
         public int MinPlayersToReady { get; set; }
 
-        private LiveMatch? LiveMatch { get; set; }
 
-        private StringChoiceField _VoteFirst = new StringChoiceField(new List<string> { "team1", "team2", "random" });
+        private StringChoiceField _VoteFirst = new(new List<string> { "team1", "team2", "random" });
         public string VoteFirst
         {
             get

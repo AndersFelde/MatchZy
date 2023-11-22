@@ -25,8 +25,10 @@ namespace Get5
 
         public override string ModuleDescription => "A plugin for running and managing CS2 practice/pugs/scrims/matches!";
 
-        public Dictionary<int, CCSPlayerController> playerData = new Dictionary<int, CCSPlayerController>();
+        public Dictionary<int, CCSPlayerController> playerData = new();
         public string chatPrefix = "[Get5] ";
+
+        private string chatCommandPrefix = ".";
 
         private LiveMatch? LiveMatch { get; set; }
 
@@ -66,6 +68,11 @@ namespace Get5
             });
             RegisterEventHandler<EventPlayerChat>((@event, info) =>
                 {
+                    string message = @event.Text.Trim().ToLower();
+                    if (!message.StartsWith(this.chatCommandPrefix))
+                    {
+                        return HookResult.Continue;
+                    }
 
                     int index = @event.Userid;
                     // From APIVersion 50 and above, EventPlayerChat userid property will be a "slot", rather than an entity index 
@@ -73,15 +80,15 @@ namespace Get5
                     var playerUserId = NativeAPI.GetUseridFromIndex(index);
                     Utils.Log($"[EventPlayerChat] UserId(Index): {index} playerUserId: {playerUserId} Message: {@event.Text}");
 
-                    var originalMessage = @event.Text.Trim();
-                    List<string> commandArgs = @event.Text.Trim().ToLower().Split(" ").ToList();
+
+                    List<string> commandArgs = @event.Text.Trim().ToLower().Replace(this.chatCommandPrefix, "").Split(" ").ToList();
 
                     CCSPlayerController player = playerData[playerUserId];
 
                     // Handling player commands
-                    if (ChatCommands.CommandActions.ContainsKey(commandArgs[0]))
+                    if (ChatCommands.CommandActions.ContainsKey(commandArgs[0]) && this.LiveMatch != null)
                     {
-                        ChatCommands.CommandActions[commandArgs[0]](player, commandArgs);
+                        ChatCommands.CommandActions[commandArgs[0]](player, commandArgs, this.LiveMatch);
                     }
 
                     return HookResult.Continue;

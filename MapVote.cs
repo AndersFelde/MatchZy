@@ -8,6 +8,7 @@ using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Runtime.CompilerServices;
+using System.ComponentModel;
 
 namespace Get5
 {
@@ -23,29 +24,53 @@ namespace Get5
 
         private bool Is_ban = true;
 
+        public bool VoteFinished = false;
+
+        public int NumberOfMaps = 1;
+
         public MapVote(MapList mapList)
         {
             this.MapList = mapList;
             this.AvailableMaps = this.MapList;
         }
-        public void HandleMapVoteChat(CCSPlayerController? player, CommandInfo? command)
+        public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban = false, bool pick = false)
         {
-            if (player == null || command == null)
+            if (this.VoteFinished)
             {
+                player.PrintToChat("Vote is finished!");
                 return;
             }
             if ((Utils.PlayerIsTerrorist(player) && this.T_turn == true) || (Utils.PlayerIsCT(player) && this.CT_turn == true))
             {
-                string voteAction = command.GetArg(0).ToLower();
-                int mapIndex = int.Parse(command.GetArg(1));
-                if (command.GetArg(1).ToLower() == "ban" && Is_ban)
+                string map = commandArgs[1];
+                if (AvailableMaps.HasMap(map))
                 {
+                    if (ban)
+                    {
+                        AvailableMaps.Remove(map);
+                        if (AvailableMaps.Count() == this.NumberOfMaps)
+                        {
+                            PickedMaps.Update(AvailableMaps);
+                        }
+                    }
+                    else
+                    {
+                        PickedMaps.Add(map);
+                    }
+                    if (AvailableMaps.Count() == this.NumberOfMaps)
+                    {
+                        VoteFinished = true;
+                    }
+                    else
+                    {
+                        player.PrintToChat("Map not available!");
+                        player.PrintToChat($"Available maps: {AvailableMaps}");
+                    }
+
 
                 }
 
-
             }
-
         }
     }
 }

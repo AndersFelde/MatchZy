@@ -7,6 +7,7 @@ using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Timers;
+using System.Runtime.CompilerServices;
 namespace Get5
 {
     public class LiveMatch
@@ -19,11 +20,11 @@ namespace Get5
 
         private int PlayedRounds = 0;
 
-        private Match Match { get; set; }
+        public Match Match { get; set; }
 
         private ReverseTeam? ReverseTeam { get; set; }
 
-        private MapVote MapVote { get; set; }
+        public MapVote MapVote { get; set; }
 
         public LiveMatch(Match match)
         {
@@ -38,8 +39,9 @@ namespace Get5
             Server.ExecuteCommand("exec live");
         }
 
-        public static void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs)
+        public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, LiveMatch liveMatch)
         {
+            liveMatch.MapVote.HandleMapVoteChat(player, commandArgs);
 
         }
 
