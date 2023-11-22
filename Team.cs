@@ -1,6 +1,7 @@
 
 using CounterStrikeSharp.API.Core;
 using System.Text.Json;
+using System.Xml;
 
 
 namespace Get5
@@ -9,20 +10,20 @@ namespace Get5
     {
         public CCSPlayerController? PlayerController { get; set; }
         public string PlayerName { get; set; }
-        private string _playerSteamID;
-        public string PlayerSteamID
+        private ulong _playerSteamID;
+        public ulong PlayerSteamID
         {
             get { return _playerSteamID; }
             set
             {
-                if (value.Length != 17)
+                if (value.ToString().Length != 17)
                 {
                     throw new System.ArgumentException("SteamID must be 17 characters long");
                 }
                 _playerSteamID = value;
             }
         }
-        public Player(string playerName, string playerSteamID, CCSPlayerController? playerController = null)
+        public Player(string playerName, ulong playerSteamID, CCSPlayerController? playerController)
         {
             this.PlayerName = playerName;
             this.PlayerSteamID = playerSteamID;
@@ -37,13 +38,30 @@ namespace Get5
         public string TeamFlag { get; set; }
         public string TeamTag { get; set; }
 
-        List<Player> Players { get; set; } = new List<Player>();
+        public int Score = 0;
+
+        public List<Player> Players { get; set; } = new List<Player>();
 
         public Team(string teamName, string teamFlag, string teamTag)
         {
             this.TeamName = teamName;
             this.TeamFlag = teamFlag;
             this.TeamTag = teamTag;
+        }
+
+        public void UpdateScore(int score)
+        {
+            this.Score = score;
+        }
+
+        public bool HasPlayer(ulong steamID)
+        {
+            return this.Players.Any(player => player.PlayerSteamID == steamID);
+        }
+
+        public Player? GetPlayer(ulong steamID)
+        {
+            return this.Players.Find(player => player.PlayerSteamID == steamID);
         }
 
     }

@@ -21,7 +21,9 @@ namespace Get5
         static public Dictionary<string, Action<CCSPlayerController, List<string>, LiveMatch>> CommandActions = new()
         {
                 { "ban", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: true) },
-                { "pick", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, pick: true) },
+                { "pick", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: false) },
+                { "stay", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: true) },
+                { "switch", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: false) },
             };
 
     }

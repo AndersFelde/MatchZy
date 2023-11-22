@@ -24,53 +24,73 @@ namespace Get5
 
         private bool Is_ban = true;
 
+        public bool VoteActive = true;
+
         public bool VoteFinished = false;
 
         public int NumberOfMaps = 1;
 
-        public MapVote(MapList mapList)
+        private LiveMatch LiveMatch { get; set; }
+
+        public MapVote(MapList mapList, LiveMatch liveMatch)
         {
             this.MapList = mapList;
             this.AvailableMaps = this.MapList;
+            this.LiveMatch = liveMatch;
         }
-        public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban = false, bool pick = false)
-        {
-            if (this.VoteFinished)
-            {
-                player.PrintToChat("Vote is finished!");
-                return;
-            }
-            if ((Utils.PlayerIsTerrorist(player) && this.T_turn == true) || (Utils.PlayerIsCT(player) && this.CT_turn == true))
-            {
-                string map = commandArgs[1];
-                if (AvailableMaps.HasMap(map))
-                {
-                    if (ban)
-                    {
-                        AvailableMaps.Remove(map);
-                        if (AvailableMaps.Count() == this.NumberOfMaps)
-                        {
-                            PickedMaps.Update(AvailableMaps);
-                        }
-                    }
-                    else
-                    {
-                        PickedMaps.Add(map);
-                    }
-                    if (AvailableMaps.Count() == this.NumberOfMaps)
-                    {
-                        VoteFinished = true;
-                    }
-                    else
-                    {
-                        player.PrintToChat("Map not available!");
-                        player.PrintToChat($"Available maps: {AvailableMaps}");
-                    }
 
+        public bool HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban)
+        {
+            if (!this.VoteFinished)
+            {
+                if ((Utils.PlayerIsTerrorist(player) && T_turn == true) || (Utils.PlayerIsCT(player) && CT_turn == true))
+                {
+                    string map = commandArgs[1];
+                    if (AvailableMaps.HasMap(map))
+                    {
+                        if (ban)
+                        {
+                            AvailableMaps.Remove(map);
+                            if (AvailableMaps.Count() == NumberOfMaps)
+                            {
+                                PickedMaps.Update(AvailableMaps);
+                            }
+                        }
+                        else
+                        {
+                            PickedMaps.Add(map);
+                        }
+                        ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
+                        ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
+                        ChatMessage.SendAllChatMessage($"Banned maps: {PickedMaps}");
+
+                        if (AvailableMaps.Count() == NumberOfMaps)
+                        {
+                            VoteFinished = true;
+                            ChatMessage.SendAllChatMessage("Vote is finished!");
+                        }
+
+
+                    }
+                    else
+                    {
+                        ChatMessage.SendPlayerChatMessage(player, "Map not available!");
+                        ChatMessage.SendPlayerChatMessage(player, $"Available maps: {AvailableMaps}");
+                    }
 
                 }
-
+                else
+                {
+                    ChatMessage.SendPlayerChatMessage(player, "Not your turn!");
+                }
             }
+            else
+            {
+
+                ChatMessage.SendPlayerChatMessage(player, "Vote is finished!");
+            }
+            return VoteFinished;
+
         }
     }
 }

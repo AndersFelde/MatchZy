@@ -10,12 +10,16 @@ namespace Get5
     {
         public Team Team1 { get; set; }
         public Team Team2 { get; set; }
+
+        public Team CT;
+        public Team Terrorists;
         public string MatchTitle { get; set; }
         public int NumMaps { get; set; }
         public int MinPlayersToReady { get; set; }
 
 
         private StringChoiceField _VoteFirst = new(new List<string> { "team1", "team2", "random" });
+
         public string VoteFirst
         {
             get
@@ -58,8 +62,8 @@ namespace Get5
         public MapList MapList { get; set; }
         public Match(string teamName1, string teamName2, string? matchTitle = null, int numMaps = 3, int MinPlayersToReady = 5, string voteFirst = "random", string mapSides = "knife", string voteMode = "team1_ban", MapList? mapList = null)
         {
-            this.Team1 = LoadTeamFromJson(teamName1);
-            this.Team2 = LoadTeamFromJson(teamName2);
+            this.Terrorists = this.Team1 = LoadTeamFromJson(teamName1);
+            this.CT = this.Team2 = LoadTeamFromJson(teamName2);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = MinPlayersToReady;
@@ -78,6 +82,19 @@ namespace Get5
             }
 
 
+        }
+        public Team? GetTeam(int teamNum)
+        {
+
+            if (Globals.TeamNumLookup[teamNum] == "T")
+            {
+                return this.Terrorists;
+            }
+            else if (Globals.TeamNumLookup[teamNum] == "CT")
+            {
+                return this.CT;
+            }
+            return null;
         }
     }
 

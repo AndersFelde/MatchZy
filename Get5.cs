@@ -26,7 +26,7 @@ namespace Get5
         public override string ModuleDescription => "A plugin for running and managing CS2 practice/pugs/scrims/matches!";
 
         public Dictionary<int, CCSPlayerController> playerData = new();
-        public string chatPrefix = "[Get5] ";
+        public static string chatPrefix = "[Get5] ";
 
         private string chatCommandPrefix = ".";
 
@@ -46,13 +46,14 @@ namespace Get5
                 // Handling whitelisted players
                 if (!player.IsBot)
                 {
-                    player.PrintToChat($"{chatPrefix} Welcome to the server!");
+                    ChatMessage.SendAllChatMessage("Welcome to the server!");
                     if (@event.Userid.UserId.HasValue)
                     {
 
                         playerData[@event.Userid.UserId.Value] = @event.Userid;
                     }
                 }
+                LiveMatch?.PlayerConnectHook(@event);
                 return HookResult.Continue;
             });
 
@@ -66,6 +67,13 @@ namespace Get5
 
                 return HookResult.Continue;
             });
+
+            RegisterEventHandler<EventCsWinPanelRound>((@event, info) =>
+            {
+                LiveMatch?.RoundEndHook(@event);
+                return HookResult.Continue;
+            }, HookMode.Pre);
+
             RegisterEventHandler<EventPlayerChat>((@event, info) =>
                 {
                     string message = @event.Text.Trim().ToLower();

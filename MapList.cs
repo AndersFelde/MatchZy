@@ -25,5 +25,10 @@ namespace Get5
         {
             return maps.Count;
         }
+
+        public override string ToString()
+        {
+            return string.Join(", ", maps);
+        }
     }
 }
