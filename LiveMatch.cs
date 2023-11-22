@@ -23,9 +23,12 @@ namespace Get5
 
         private ReverseTeam? ReverseTeam { get; set; }
 
+        private MapVote MapVote { get; set; }
+
         public LiveMatch(Match match)
         {
             this.Match = match;
+            this.MapVote = new MapVote(mapList: this.Match.MapList);
         }
 
         public void StartMatch()
@@ -35,9 +38,8 @@ namespace Get5
             Server.ExecuteCommand("exec live");
         }
 
-        public static void HandleMapVoteChat(CCSPlayerController? player, CommandInfo? command)
+        public static void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs)
         {
-            player.TeamNum;
 
         }
 

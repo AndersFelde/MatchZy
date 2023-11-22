@@ -21,18 +21,30 @@ namespace Get5
         private bool CT_turn = true;
         private bool T_turn = true;
 
+        private bool Is_ban = true;
+
         public MapVote(MapList mapList)
         {
             this.MapList = mapList;
             this.AvailableMaps = this.MapList;
         }
-        public static void HandleMapVoteChat(CCSPlayerController? player, CommandInfo? command)
+        public void HandleMapVoteChat(CCSPlayerController? player, CommandInfo? command)
         {
             if (player == null || command == null)
             {
                 return;
             }
-            if (Globals.)
+            if ((Utils.PlayerIsTerrorist(player) && this.T_turn == true) || (Utils.PlayerIsCT(player) && this.CT_turn == true))
+            {
+                string voteAction = command.GetArg(0).ToLower();
+                int mapIndex = int.Parse(command.GetArg(1));
+                if (command.GetArg(1).ToLower() == "ban" && Is_ban)
+                {
+
+                }
+
+
+            }
 
         }
     }
