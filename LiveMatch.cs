@@ -79,7 +79,7 @@ namespace Get5
         public void EndWarmup()
         {
             IsWarmup = false;
-            StartKnifeRound();
+            StartMapVote();
         }
 
         public void StartMapVote()
@@ -97,7 +97,7 @@ namespace Get5
             MapVote.VoteActive = false;
             Server.ExecuteCommand("unpause");
             Server.ExecuteCommand("sv_pausable 0");
-            StartLive();
+            StartKnifeRound();
         }
 
         public void StartKnifeRound()
@@ -112,24 +112,32 @@ namespace Get5
         {
             IsKnifeRound = false;
             KnifeRound.KnifeActive = false;
-            StartMapVote();
+            StartLive();
         }
 
-        public void SwapTeams()
-        {
-            Server.ExecuteCommand("mp_swapteams");
-            (Match.Terrorists, Match.CT) = (Match.CT, Match.Terrorists);
-        }
 
         public void StartLive()
         {
             IsLive = true;
-            DamageInfo.InitPlayerDamageInfo();
             Server.ExecuteCommand("exec live");
             ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
             ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
             ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
 
+        }
+
+        public void NextMap()
+        {
+            if (MapVote.PickedMaps.Count() == 0)
+            {
+                EndLive();
+                return;
+            }
+
+            string map = MapVote.PickedMaps.maps[0];
+            MapVote.PickedMaps.RemoveAt(0);
+            Server.ExecuteCommand($"changelevel {map}");
+            StartLive();
         }
         public void EndLive()
         {
@@ -137,6 +145,14 @@ namespace Get5
             ChatMessage.SendConsoleMessage($"Match ended {Match.CT.TeamName}: {Match.CT.Score} - {Match.Terrorists.TeamName}: {Match.Terrorists.Score}");
             IsLive = false;
             Get5.LiveMatch = null;
+        }
+
+        public void SwapTeams()
+        {
+            Server.ExecuteCommand("mp_swapteams");
+            (Match.Terrorists, Match.CT) = (Match.CT, Match.Terrorists);
+            Match.Terrorists.CSTeam = CsTeam.Terrorist;
+            Match.CT.CSTeam = CsTeam.CounterTerrorist;
         }
 
         public void Pause()

@@ -20,6 +20,16 @@ namespace Get5
             maps.Add(mapName);
         }
 
+        public void RemoveAt(int index)
+        {
+            maps.RemoveAt(index);
+        }
+
+        public void Append(MapList mapList)
+        {
+            maps.AddRange(mapList.maps);
+        }
+
         public void Update(MapList mapList)
         {
             this.maps = mapList.maps;

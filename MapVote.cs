@@ -19,8 +19,9 @@ namespace Get5
 
         public MapList PickedMaps { get; set; } = new MapList();
 
-        private bool CT_turn = true;
         private bool T_turn = true;
+
+        private int vote_counter = 0;
 
         private bool Is_ban = true;
 
@@ -37,13 +38,44 @@ namespace Get5
             this.MapList = mapList;
             this.AvailableMaps = this.MapList;
             this.LiveMatch = liveMatch;
+            if (LiveMatch.Match.VoteFirst == "random")
+            {
+
+                Random random = new Random();
+                int index = random.Next(0, 2);
+                if (index == 0)
+                {
+                    T_turn = false;
+                }
+                else
+                {
+                    T_turn = true;
+                }
+            }
+            else if (LiveMatch.Match.VoteFirst == "team1")
+            {
+                T_turn = false;
+            }
+            else if (LiveMatch.Match.VoteFirst == "team2")
+            {
+                T_turn = true;
+            }
+
+            if (LiveMatch.Match.VoteMode == "ban")
+            {
+                Is_ban = true;
+            }
+            else if (LiveMatch.Match.VoteMode == "pick")
+            {
+                Is_ban = false;
+            }
         }
 
         public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban)
         {
             if (!this.VoteFinished)
             {
-                if ((Utils.PlayerIsTerrorist(player) && T_turn == true) || (Utils.PlayerIsCT(player) && CT_turn == true))
+                if ((Utils.PlayerIsTerrorist(player) && T_turn == true) || (Utils.PlayerIsCT(player) && T_turn == false))
                 {
                     string map = commandArgs[1];
                     if (AvailableMaps.HasMap(map))
@@ -51,20 +83,30 @@ namespace Get5
                         if (ban)
                         {
                             AvailableMaps.Remove(map);
-                            if (AvailableMaps.Count() == NumberOfMaps)
-                            {
-                                PickedMaps.Update(AvailableMaps);
-                            }
                         }
                         else
                         {
                             PickedMaps.Add(map);
                         }
+                        FlipVoteTurn();
+
+                        vote_counter++;
+                        if (vote_counter == 2)
+                        {
+                            FlipVoteMode();
+                        }
+
+
                         ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
                         ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
                         ChatMessage.SendAllChatMessage($"Banned maps: {PickedMaps}");
 
-                        if (AvailableMaps.Count() == NumberOfMaps)
+                        if (AvailableMaps.Count() + PickedMaps.Count() == NumberOfMaps)
+                        {
+                            PickedMaps.Append(AvailableMaps);
+                        }
+
+                        if (PickedMaps.Count() == NumberOfMaps)
                         {
                             VoteFinished = true;
                             ChatMessage.SendAllChatMessage("Vote is finished!");
@@ -91,6 +133,20 @@ namespace Get5
                 ChatMessage.SendPlayerChatMessage(player, "Vote is finished!");
             }
 
+        }
+        private void FlipVoteMode()
+        {
+            Is_ban = !Is_ban;
+            vote_counter = 0;
+        }
+
+        private void FlipVoteTurn()
+        {
+            T_turn = !T_turn;
+        }
+        public void PrintAvailableMaps()
+        {
+            ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
         }
     }
 }

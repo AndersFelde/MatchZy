@@ -38,6 +38,15 @@ namespace Get5
 
         }
 
+        public void RoundStartHook(EventRoundStart @event)
+        {
+            if (IsLive)
+            {
+
+                DamageInfo.InitPlayerDamageInfo();
+            }
+        }
+
         public void PlayerHurtHook(EventPlayerHurt @event)
         {
             if (IsLive)
@@ -98,6 +107,7 @@ namespace Get5
         }
         public void GameEndHook(EventGameEnd @event)
         {
+            NextMap();
             EndLive();
         }
 

@@ -1,6 +1,7 @@
 
 using CounterStrikeSharp.API.Core;
 using System.Text.Json;
+using CounterStrikeSharp.API.Modules.Utils;
 
 
 namespace Get5
@@ -45,7 +46,7 @@ namespace Get5
                 _MapSides.Value = value;
             }
         }
-        private StringChoiceField _VoteMode = new StringChoiceField(new List<string> { "team1_ban", "team2_ban", "team1_pick", "team2_pick" });
+        private StringChoiceField _VoteMode = new StringChoiceField(new List<string> { "ban", "pick" });
         public string VoteMode
         {
             get
@@ -60,17 +61,18 @@ namespace Get5
         }
 
         public MapList MapList { get; set; }
-        public Match(string teamName1, string teamName2, string? matchTitle = null, int numMaps = 3, int MinPlayersToReady = 5, string voteFirst = "random", string mapSides = "knife", string voteMode = "team1_ban", MapList? mapList = null)
+        public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)
         {
-            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1);
-            this.CT = this.Team2 = Team.LoadFromJson(teamName2);
+            // WARN: team1 is terrorist and team2 is CT ensures that MapVote goes in the correct order
+            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1, CsTeam.Terrorist);
+            this.CT = this.Team2 = Team.LoadFromJson(teamName2, CsTeam.CounterTerrorist);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = MinPlayersToReady;
             this.VoteFirst = voteFirst;
             this.MapSides = mapSides;
             this.VoteMode = voteMode;
-            this.MapList = mapList ?? new MapList();
+            this.MapList = mapList;
         }
         public static Match LoadFromJson(string match_name)
         {
@@ -107,7 +109,7 @@ namespace Get5
             List<string> maps = jsonEl.GetProperty("mapList").EnumerateArray().Select(element => element.ToString()).ToList();
             MapList mapList = new(maps);
 
-            return new Match(teamName1, teamName2, matchTitle, numMaps, minPlayersToReady, voteFirst, mapSides, voteMode, mapList);
+            return new Match(teamName1: teamName1, teamName2: teamName2, matchTitle: matchTitle, numMaps: numMaps, minPlayersToReady: minPlayersToReady, voteFirst: voteFirst, mapSides: mapSides, voteMode: voteMode, mapList: mapList);
         }
 
         public List<Player> GetAllPlayers()

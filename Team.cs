@@ -1,6 +1,7 @@
 
 using CounterStrikeSharp.API.Core;
 using System.Text.Json;
+using CounterStrikeSharp.API.Modules.Utils;
 using System.Xml;
 
 
@@ -25,12 +26,21 @@ namespace Get5
                 _playerSteamID = value;
             }
         }
-        public Player(string playerName, ulong playerSteamID, CCSPlayerController? playerController)
+        public Player(string name, ulong steamID, CCSPlayerController? playerController = null)
         {
-            this.Name = playerName;
-            this.SteamID = playerSteamID;
+            this.Name = name;
+            this.SteamID = steamID;
             this.PlayerController = playerController;
 
+        }
+
+        public static Player LoadFromRawJson(string json)
+        {
+
+            JsonElement jsonEl = JsonDocument.Parse(json).RootElement;
+            ulong steamID = jsonEl.GetProperty("teamFlag").GetUInt64();
+            string name = jsonEl.GetProperty("teamTag").ToString();
+            return new Player(name: name, steamID: steamID);
         }
 
         public void Ready()
@@ -55,15 +65,20 @@ namespace Get5
         public string TeamTag { get; set; }
         public bool IsPaused = false;
 
+        public CsTeam CSTeam { get; set; }
+
+
         public int Score = 0;
 
         public List<Player> Players { get; set; } = new List<Player>();
 
-        public Team(string teamName, string teamFlag, string teamTag)
+        public Team(string teamName, string teamFlag, string teamTag, CsTeam csTeam, List<Player> players)
         {
             this.TeamName = teamName;
             this.TeamFlag = teamFlag;
             this.TeamTag = teamTag;
+            this.CSTeam = csTeam;
+            this.Players = players;
         }
 
         public void UpdateScore(int score)
@@ -91,15 +106,36 @@ namespace Get5
             return this.Players.Find(player => player.SteamID == player.SteamID) ?? throw new System.InvalidOperationException($"Player with SteamID {player.SteamID} not found in team {this.TeamName}");
         }
 
-        public static Team LoadFromJson(string teamName)
+        public static Team LoadFromJson(string team_name, CsTeam csTeam)
         {
-            string json = Utils.ReadConfigFile($"{teamName}.json");
-            return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamName}.json");
+            string json = Utils.ReadConfigFile(team_name);
+            JsonElement jsonEl = JsonDocument.Parse(json).RootElement;
+
+            string teamFlag = jsonEl.GetProperty("teamFlag").ToString();
+
+            string? teamTag = jsonEl.TryGetProperty("teamTag", out JsonElement teamTagElement)
+                ? teamTagElement.ToString()
+                : team_name[..2].ToUpper();
+
+
+            List<Player> players = jsonEl.TryGetProperty("players", out JsonElement playerListElement)
+                ? playerListElement.EnumerateArray().Select(p => Player.LoadFromRawJson(p.ToString())).ToList()
+                : new List<Player>();
+
+            return new Team(teamName: team_name,
+                teamTag: teamTag,
+                teamFlag: teamFlag,
+                players: players,
+                csTeam: csTeam);
+            ;
+            // string json = Utils.ReadConfigFile($"{teamFlag}.json");
+            // return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamFlag}.json");
         }
 
         public void JoinPlayer(CCSPlayerController player)
         {
             GetPlayer(player.SteamID).PlayerController = player;
+            player.ChangeTeam(CSTeam);
         }
 
         public void DisconnectPlayer(CCSPlayerController player)
