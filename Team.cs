@@ -96,9 +96,9 @@ namespace Get5
             return this.Players.Any(player => player.SteamID == steamID);
         }
 
-        public bool HasPlayer(CCSPlayerController player)
+        public bool HasPlayer(CCSPlayerController checkPlayer)
         {
-            return this.Players.Any(player => player.SteamID == player.SteamID);
+            return this.Players.Any(player => player.SteamID == checkPlayer.SteamID);
         }
 
         public Player GetPlayer(ulong steamID)
@@ -106,9 +106,9 @@ namespace Get5
             return this.Players.Find(player => player.SteamID == steamID) ?? throw new System.InvalidOperationException($"Player with SteamID {steamID} not found in team {this.TeamName}");
         }
 
-        public Player GetPlayer(CCSPlayerController player)
+        public Player GetPlayer(CCSPlayerController checkPlayer)
         {
-            return this.Players.Find(player => player.SteamID == player.SteamID) ?? throw new System.InvalidOperationException($"Player with SteamID {player.SteamID} not found in team {this.TeamName}");
+            return this.Players.Find(player => player.SteamID == checkPlayer.SteamID) ?? throw new System.InvalidOperationException($"Player with SteamID {checkPlayer.SteamID} not found in team {this.TeamName}");
         }
 
         public static Team LoadFromJson(string team_name)

@@ -18,6 +18,8 @@
 
 ## Json format
 
+**/csgo/cfg/get5/**
+
 `match_name.json`
 
 ```json

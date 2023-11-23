@@ -18,7 +18,7 @@ namespace Get5
     [MinimumApiVersion(30)]
     public partial class Get5 : BasePlugin
     {
-        public override string ModuleName => "MatchZy";
+        public override string ModuleName => "Get5";
         public override string ModuleVersion => "0.1";
 
         public override string ModuleAuthor => "WD- (https://github.com/shobhit-pathak/)";

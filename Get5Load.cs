@@ -17,59 +17,57 @@ namespace Get5
     public partial class Get5
     {
 
-        public override void Load(bool HotReload)
+        private static bool PlayerIsValid(CCSPlayerController player)
         {
-            if (LiveMatch == null)
+            if (!player.IsBot)
             {
-                return;
+                if (player.UserId.HasValue)
+                {
+
+                    return true;
+                }
             }
+            return false;
+
+        }
+        public override void Load(bool hotReload)
+        {
+
+            ChatMessage.SendConsoleMessage("GET5 plugin live!");
+            // if (LiveMatch == null)
+            // {
+            //     return;
+            // }
 
             RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
             {
+                if (LiveMatch == null) return HookResult.Continue;
                 Utils.Log($"[FULL CONNECT] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has connected!");
-                var player = @event.Userid;
-
-                // Handling whitelisted players
-                if (!player.IsBot)
-                {
-                    ChatMessage.SendPlayerChatMessage(player, "Welcome to the server!");
-                    if (@event.Userid.UserId.HasValue)
-                    {
-
-                        playerData[@event.Userid.UserId.Value] = @event.Userid;
-                    }
-                }
+                //To fix player not beeing passed in chat event
+                if (PlayerIsValid(@event.Userid)) playerData[@event.Userid.UserId.Value] = @event.Userid;
                 LiveMatch?.PlayerConnectHook(@event);
                 return HookResult.Continue;
             });
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
             {
-                Utils.Log($"[FULL CONNECT] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has connected!");
-                var player = @event.Userid;
-
-                // Handling whitelisted players
-                if (!player.IsBot)
-                {
-                    ChatMessage.SendPlayerChatMessage(player, "Welcome to the server!");
-                    if (@event.Userid.UserId.HasValue)
-                    {
-
-                        playerData[@event.Userid.UserId.Value] = @event.Userid;
-                    }
-                }
+                if (LiveMatch == null) return HookResult.Continue;
+                //To fix player not beeing passed in chat event
+                if (PlayerIsValid(@event.Userid)) playerData.Remove(@event.Userid.UserId.Value);
                 LiveMatch?.PlayerDisconnectHook(@event);
                 return HookResult.Continue;
             });
 
             RegisterEventHandler<EventGameEnd>((@event, info) =>
             {
+                if (LiveMatch == null) return HookResult.Continue;
                 LiveMatch?.GameEndHook(@event);
                 return HookResult.Continue;
             });
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
             {
+                if (LiveMatch == null) return HookResult.Continue;
                 Utils.Log($"[EventPlayerDisconnect] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has disconnected!");
                 if (@event.Userid.UserId.HasValue)
                 {
@@ -81,21 +79,28 @@ namespace Get5
 
             RegisterEventHandler<EventCsWinPanelRound>((@event, info) =>
             {
+                if (LiveMatch == null) return HookResult.Continue;
                 LiveMatch?.RoundEndHook(@event);
                 return HookResult.Continue;
             }, HookMode.Pre);
 
             RegisterEventHandler<EventPlayerChat>((@event, info) =>
                 {
+                    if (LiveMatch == null) return HookResult.Continue;
                     string message = @event.Text.Trim().ToLower();
                     if (!message.StartsWith(chatCommandPrefix))
                     {
                         return HookResult.Continue;
                     }
 
+                    int currentVersion = Api.GetVersion();
                     int index = @event.Userid;
                     // From APIVersion 50 and above, EventPlayerChat userid property will be a "slot", rather than an entity index 
                     // Player index is slot + 1
+                    if (currentVersion >= 50)
+                    {
+                        index += 1;
+                    }
                     var playerUserId = NativeAPI.GetUseridFromIndex(index);
                     Utils.Log($"[EventPlayerChat] UserId(Index): {index} playerUserId: {playerUserId} Message: {@event.Text}");
 
@@ -115,6 +120,7 @@ namespace Get5
 
             RegisterEventHandler<EventPlayerHurt>((@event, info) =>
             {
+                if (LiveMatch == null) return HookResult.Continue;
                 CCSPlayerController attacker = @event.Attacker;
 
                 if (!attacker.IsValid || attacker.IsBot && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))

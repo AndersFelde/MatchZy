@@ -20,7 +20,7 @@ namespace Get5
     {
         [RequiresPermissions("@css/generic")]
         [ConsoleCommand("get5", "This is an example command description")]
-        public static void get5Command(CCSPlayerController? player, CommandInfo command)
+        public void get5Command(CCSPlayerController? player, CommandInfo command)
         {
             ChatMessage.SendConsoleMessage("Get5 version 1.0.0");
         }
@@ -30,10 +30,8 @@ namespace Get5
         [CommandHelper(minArgs: 1, usage: "{match_name}", whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
         public void get5_startCommand(CCSPlayerController? player, CommandInfo command)
         {
-
-            string match_name = command.ArgByIndex(0);
+            string match_name = command.ArgByIndex(1);
             LiveMatch = new LiveMatch(match: Match.LoadFromJson(match_name), get5: this);
-
         }
 
         [RequiresPermissions("@css/generic")]
@@ -42,9 +40,7 @@ namespace Get5
         public void get5_stopCommand(CCSPlayerController? player, CommandInfo command)
         {
 
-            string match_name = command.ArgByIndex(0);
             LiveMatch = null;
-
         }
 
         [RequiresPermissions("@css/generic")]
