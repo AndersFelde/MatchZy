@@ -6,17 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- <ItemGroup>
-    <Reference Include="CounterStrikeSharp.API">
-       <HintPath>lib/CounterStrikeSharp.API.dll</HintPath>
-    </Reference>
-  </ItemGroup> -->
-  <!-- <ItemGroup>
-<Content Remove="MatchZy\**" />
-  <Compile Remove="MatchZy\**" />
-  <EmbeddedResource Remove="MatchZy\**" />
-  <None Remove="MatchZy\**" />
-</ItemGroup> -->
+  <ItemGroup>
+    <Content Remove="MatchZy\**" />
+    <Compile Remove="MatchZy\**" />
+    <EmbeddedResource Remove="MatchZy\**" />
+    <None Remove="MatchZy\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.67" />

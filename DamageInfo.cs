@@ -20,11 +20,13 @@ namespace Get5
 			for (int i = 0; i < players.Count; i++)
 			{
 				var player1 = players[i].PlayerController;
+				if (player1 == null) continue;
 				if (player1.IsBot) continue;
 				int attackerId = player1.UserId.Value;
 				for (int j = 0; j < players.Count; j++)
 				{
 					var player2 = players[j].PlayerController;
+					if (player2 == null) continue;
 					if (player1 == player2) continue;
 					if (player2.IsBot) continue;
 					if (player1.TeamNum == player2.TeamNum) continue;

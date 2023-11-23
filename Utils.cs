@@ -28,11 +28,15 @@ namespace Get5
             get { return _Value; }
             set
             {
-                if (value != null && !Choices.Contains(value))
+                if (value != null)
                 {
-                    throw new ArgumentException($"Invalid value: {value}. Value must be one of the choices.");
+                    if (Choices.Contains(value))
+                    {
+                        _Value = value;
+                        return;
+                    }
                 }
-                _Value = value;
+                throw new ArgumentException($"Invalid value: {value}. Value must be one of the choices.");
             }
         }
         List<string> Choices { get; set; }

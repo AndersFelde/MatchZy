@@ -59,7 +59,7 @@ namespace Get5
             foreach (var player in players)
             {
                 //makes health 0 if PlayerController is not defined, which will not enter if statement
-                if ((player.PlayerController?.PlayerPawn.Value.Health ?? 0) > 0)
+                if (player.PlayerController != null && player.PlayerController.PlayerPawn.Value.Health > 0)
                 {
                     totalHealth += player.PlayerController.PlayerPawn.Value.Health;
                     count += 0;
@@ -71,7 +71,10 @@ namespace Get5
 
         public void StartWarmup()
         {
+            Match.CT.UnReadyPlayers();
+            Match.Terrorists.UnReadyPlayers();
             ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
+            ChatMessage.SendAllChatMessage("Send '.ready' to ready");
             IsWarmup = true;
             Server.ExecuteCommand("exec warmup");
         }
@@ -79,7 +82,14 @@ namespace Get5
         public void EndWarmup()
         {
             IsWarmup = false;
-            StartMapVote();
+            if (MapVote.VoteFinished)
+            {
+                StartKnifeRound();
+            }
+            else
+            {
+                StartMapVote();
+            }
         }
 
         public void StartMapVote()
@@ -90,6 +100,13 @@ namespace Get5
             Server.ExecuteCommand("sv_pausable 1");
             Server.ExecuteCommand("pause");
         }
+        private void ChangeToNextMap()
+        {
+
+            string map = MapVote.PickedMaps.maps[0];
+            MapVote.PickedMaps.RemoveAt(0);
+            Server.ExecuteCommand($"changelevel {map}");
+        }
 
         public void EndMapVote()
         {
@@ -97,6 +114,7 @@ namespace Get5
             MapVote.VoteActive = false;
             Server.ExecuteCommand("unpause");
             Server.ExecuteCommand("sv_pausable 0");
+            ChangeToNextMap();
             StartKnifeRound();
         }
 
@@ -134,10 +152,8 @@ namespace Get5
                 return;
             }
 
-            string map = MapVote.PickedMaps.maps[0];
-            MapVote.PickedMaps.RemoveAt(0);
-            Server.ExecuteCommand($"changelevel {map}");
-            StartLive();
+            ChangeToNextMap();
+            StartWarmup();
         }
         public void EndLive()
         {

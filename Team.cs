@@ -45,16 +45,22 @@ namespace Get5
 
         public void Ready()
         {
-            ChatMessage.SendPlayerChatMessage(PlayerController, "You are now ready");
             this.IsReady = true;
-            PlayerController.Clan = "[READY]";
+            if (PlayerController != null)
+            {
+                ChatMessage.SendPlayerChatMessage(PlayerController, "You are now ready");
+                PlayerController.Clan = "[READY]";
+            }
         }
 
         public void UnReady()
         {
-            ChatMessage.SendPlayerChatMessage(PlayerController, "You are not ready");
             this.IsReady = false;
-            PlayerController.Clan = "[NOT READY]";
+            if (PlayerController != null)
+            {
+                ChatMessage.SendPlayerChatMessage(PlayerController, "You are not ready");
+                PlayerController.Clan = "[NOT READY]";
+            }
         }
     }
 
@@ -132,6 +138,14 @@ namespace Get5
             // return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamFlag}.json");
         }
 
+        public void UnReadyPlayers()
+        {
+            foreach (var player in Players)
+            {
+                player.UnReady();
+            }
+        }
+
         public void JoinPlayer(CCSPlayerController player)
         {
             GetPlayer(player.SteamID).PlayerController = player;
@@ -143,6 +157,17 @@ namespace Get5
             var p = GetPlayer(player.SteamID);
             p.PlayerController = null;
             p.IsReady = false;
+        }
+
+        public void GiveTeamTags()
+        {
+            foreach (var player in Players)
+            {
+                if (player.PlayerController != null)
+                {
+                    player.PlayerController.Clan = $"[{this.TeamTag}]";
+                }
+            }
         }
 
         public int JoinedPlayers()

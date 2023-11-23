@@ -108,7 +108,6 @@ namespace Get5
         public void GameEndHook(EventGameEnd @event)
         {
             NextMap();
-            EndLive();
         }
 
         public void HandlePauseCommand(CCSPlayerController player)
