@@ -26,6 +26,8 @@ namespace Get5
                 { "switch", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: false) },
                 { "ready", (player, commandArgs, liveMatch) => liveMatch.HandleReadyChat(player) },
                 { "unready", (player, commandArgs, liveMatch) => liveMatch.HandleUnReadyChat(player) },
+                { "pause", (player, commandArgs, liveMatch) => liveMatch.HandlePauseCommand(player) },
+                { "unpause", (player, commandArgs, liveMatch) => liveMatch.HandleUnPauseCommand(player) },
             };
 
     }
