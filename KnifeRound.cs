@@ -74,11 +74,10 @@ namespace Get5
                 finalEvent = 9;
             }
             @event.FinalEvent = finalEvent;
-            KnifeActive = false;
-            LiveMatch.EndKnifeRound();
+            ChatMessage.SendAllChatMessage("Winning team choose to stay or switch");
 
         }
-        public void HandleKnifeRoundChat(CCSPlayerController player, List<string> commandArgs, bool stay)
+        public void HandleKnifeRoundChat(CCSPlayerController player, bool stay)
         {
             if (KnifeActive)
             {
@@ -100,10 +99,11 @@ namespace Get5
                     }
                     else
                     {
-                        ChatMessage.SendAllChatMessage($"{winner} chose to swap");
+                        ChatMessage.SendAllChatMessage($"{winner} chose to switch");
                         LiveMatch.SwapTeams();
                     }
                     KnifeActive = false;
+                    LiveMatch.EndKnifeRound();
                 }
                 else
                 {

@@ -28,7 +28,7 @@ namespace Get5
         public Dictionary<int, CCSPlayerController> playerData = new();
         public static string chatPrefix = "[Get5] ";
 
-        private string chatCommandPrefix = ".";
+        public static string chatCommandPrefix = ".";
 
         public LiveMatch? LiveMatch { get; set; }
 

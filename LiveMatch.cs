@@ -120,10 +120,26 @@ namespace Get5
 
         public void StartKnifeRound()
         {
-            ChatMessage.SendAllChatMessage("Knife round is starting!");
-            IsKnifeRound = true;
-            KnifeRound.KnifeActive = true;
-            Server.ExecuteCommand("exec knife");
+            if (Match.MapSides == "knife")
+            {
+                ChatMessage.SendAllChatMessage("Knife round is starting!");
+                IsKnifeRound = true;
+                KnifeRound.KnifeActive = true;
+                Server.ExecuteCommand("exec knife");
+
+            }
+            else
+            {
+                if (Match.MapSides == "stay")
+                {
+                    ChatMessage.SendAllChatMessage("CT will stay on CT side");
+                }
+                else if (Match.MapSides == "switch")
+                {
+                    ChatMessage.SendAllChatMessage("CT will switch to T side");
+                    SwapTeams();
+                }
+            }
         }
 
         public void EndKnifeRound()
@@ -167,8 +183,6 @@ namespace Get5
         {
             Server.ExecuteCommand("mp_swapteams");
             (Match.Terrorists, Match.CT) = (Match.CT, Match.Terrorists);
-            Match.Terrorists.CSTeam = CsTeam.Terrorist;
-            Match.CT.CSTeam = CsTeam.CounterTerrorist;
         }
 
         public void Pause()

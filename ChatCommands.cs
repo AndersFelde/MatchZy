@@ -22,13 +22,24 @@ namespace Get5
         {
                 { "ban", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: true) },
                 { "pick", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapVoteChat(player, commandArgs, ban: false) },
-                { "stay", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: true) },
-                { "switch", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, commandArgs, stay: false) },
+                { "stay", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, stay: true) },
+                { "switch", (player, commandArgs, liveMatch) => liveMatch.KnifeRound.HandleKnifeRoundChat(player, stay: false) },
                 { "ready", (player, commandArgs, liveMatch) => liveMatch.HandleReadyChat(player) },
                 { "unready", (player, commandArgs, liveMatch) => liveMatch.HandleUnReadyChat(player) },
                 { "pause", (player, commandArgs, liveMatch) => liveMatch.HandlePauseCommand(player) },
                 { "unpause", (player, commandArgs, liveMatch) => liveMatch.HandleUnPauseCommand(player) },
+                { "help", (player, commandArgs, liveMatch) => PrintHelp() },
             };
+
+        public static void PrintHelp()
+        {
+            ChatMessage.SendAllChatMessage("Available commands:");
+            foreach (var command in CommandActions)
+            {
+                ChatMessage.SendAllChatMessage($"{Get5.chatCommandPrefix}{command.Key}");
+            }
+
+        }
 
     }
 

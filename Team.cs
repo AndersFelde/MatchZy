@@ -38,8 +38,8 @@ namespace Get5
         {
 
             JsonElement jsonEl = JsonDocument.Parse(json).RootElement;
-            ulong steamID = jsonEl.GetProperty("teamFlag").GetUInt64();
-            string name = jsonEl.GetProperty("teamTag").ToString();
+            ulong steamID = jsonEl.GetProperty("steamID").GetUInt64();
+            string name = jsonEl.GetProperty("name").ToString();
             return new Player(name: name, steamID: steamID);
         }
 
@@ -78,12 +78,11 @@ namespace Get5
 
         public List<Player> Players { get; set; } = new List<Player>();
 
-        public Team(string teamName, string teamFlag, string teamTag, CsTeam csTeam, List<Player> players)
+        public Team(string teamName, string teamFlag, string teamTag, List<Player> players)
         {
             this.TeamName = teamName;
             this.TeamFlag = teamFlag;
             this.TeamTag = teamTag;
-            this.CSTeam = csTeam;
             this.Players = players;
         }
 
@@ -112,12 +111,18 @@ namespace Get5
             return this.Players.Find(player => player.SteamID == player.SteamID) ?? throw new System.InvalidOperationException($"Player with SteamID {player.SteamID} not found in team {this.TeamName}");
         }
 
-        public static Team LoadFromJson(string team_name, CsTeam csTeam)
+        public static Team LoadFromJson(string team_name)
         {
             string json = Utils.ReadConfigFile(team_name);
             JsonElement jsonEl = JsonDocument.Parse(json).RootElement;
 
-            string teamFlag = jsonEl.GetProperty("teamFlag").ToString();
+            string? teamName = jsonEl.TryGetProperty("teamName", out JsonElement teamNameElement)
+                ? teamNameElement.ToString()
+                : team_name;
+
+            string teamFlag = jsonEl.TryGetProperty("teamFlag", out JsonElement teamFlagElement)
+                ? teamFlagElement.ToString()
+                : "NO";
 
             string? teamTag = jsonEl.TryGetProperty("teamTag", out JsonElement teamTagElement)
                 ? teamTagElement.ToString()
@@ -128,14 +133,12 @@ namespace Get5
                 ? playerListElement.EnumerateArray().Select(p => Player.LoadFromRawJson(p.ToString())).ToList()
                 : new List<Player>();
 
-            return new Team(teamName: team_name,
+            return new Team(teamName: teamName,
                 teamTag: teamTag,
                 teamFlag: teamFlag,
-                players: players,
-                csTeam: csTeam);
+                players: players
+                );
             ;
-            // string json = Utils.ReadConfigFile($"{teamFlag}.json");
-            // return JsonSerializer.Deserialize<Team>(json) ?? throw new InvalidOperationException($"Failed to deserialize the team from {teamFlag}.json");
         }
 
         public void UnReadyPlayers()

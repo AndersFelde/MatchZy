@@ -80,7 +80,8 @@ namespace Get5
                     string map = commandArgs[1];
                     if (AvailableMaps.HasMap(map))
                     {
-                        if (ban)
+                        // hvis man bare spiller ett map, banner man til ett map er igjen
+                        if (ban || NumberOfMaps == 1)
                         {
                             AvailableMaps.Remove(map);
                         }

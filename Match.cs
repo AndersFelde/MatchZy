@@ -12,8 +12,27 @@ namespace Get5
         public Team Team1 { get; set; }
         public Team Team2 { get; set; }
 
-        public Team CT;
-        public Team Terrorists;
+        private Team? _CT;
+        public Team CT
+        {
+            get { return _CT; }
+            set
+            {
+                _CT = value;
+                _CT.CSTeam = CsTeam.CounterTerrorist;
+            }
+        }
+
+        private Team? _Terrorists;
+        public Team Terrorists
+        {
+            get { return _Terrorists; }
+            set
+            {
+                _Terrorists = value;
+                _Terrorists.CSTeam = CsTeam.Terrorist;
+            }
+        }
         public string MatchTitle { get; set; }
         public int NumMaps { get; set; }
         public int MinPlayersToReady { get; set; }
@@ -33,7 +52,7 @@ namespace Get5
                 _VoteFirst.Value = value;
             }
         }
-        private StringChoiceField _MapSides = new StringChoiceField(new List<string> { "team1_ct", "team2_t", "knife" });
+        private StringChoiceField _MapSides = new StringChoiceField(new List<string> { "team1_ct", "team2_ct", "knife" });
         public string MapSides
         {
             get
@@ -64,8 +83,8 @@ namespace Get5
         public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)
         {
             // WARN: team1 is terrorist and team2 is CT ensures that MapVote goes in the correct order
-            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1, CsTeam.Terrorist);
-            this.CT = this.Team2 = Team.LoadFromJson(teamName2, CsTeam.CounterTerrorist);
+            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1);
+            this.CT = this.Team2 = Team.LoadFromJson(teamName2);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = MinPlayersToReady;
@@ -90,7 +109,7 @@ namespace Get5
                 ? numMapsElement.GetInt32()
                 : 3;
 
-            int minPlayersToReady = jsonEl.TryGetProperty("MinPlayersToReady", out JsonElement minPlayersToReadyElement)
+            int minPlayersToReady = jsonEl.TryGetProperty("minPlayersToReady", out JsonElement minPlayersToReadyElement)
                 ? minPlayersToReadyElement.GetInt32()
                 : 5;
 

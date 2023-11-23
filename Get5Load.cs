@@ -88,7 +88,7 @@ namespace Get5
             RegisterEventHandler<EventPlayerChat>((@event, info) =>
                 {
                     string message = @event.Text.Trim().ToLower();
-                    if (!message.StartsWith(this.chatCommandPrefix))
+                    if (!message.StartsWith(chatCommandPrefix))
                     {
                         return HookResult.Continue;
                     }
@@ -100,7 +100,7 @@ namespace Get5
                     Utils.Log($"[EventPlayerChat] UserId(Index): {index} playerUserId: {playerUserId} Message: {@event.Text}");
 
 
-                    List<string> commandArgs = @event.Text.Trim().ToLower().Replace(this.chatCommandPrefix, "").Split(" ").ToList();
+                    List<string> commandArgs = @event.Text.Trim().ToLower().Replace(chatCommandPrefix, "").Split(" ").ToList();
 
                     CCSPlayerController player = playerData[playerUserId];
 
