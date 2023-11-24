@@ -32,6 +32,14 @@ namespace Get5
 
         public LiveMatch? LiveMatch { get; set; }
 
+        public void Debug()
+        {
+            Console.WriteLine("LiveMatch DEBUG");
+            Console.WriteLine($"LiveMatch {LiveMatch}");
+            Console.WriteLine($"chatPrefix {chatPrefix}");
+            Console.WriteLine($"chatCommandPrefix {chatCommandPrefix}");
+        }
+
     }
 
 }

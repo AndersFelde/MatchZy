@@ -22,6 +22,13 @@ namespace Get5
             LiveMatch = liveMatch;
         }
 
+        public void Debug()
+        {
+            Console.WriteLine("Warmup DEBUG");
+            Console.WriteLine($"LiveMatch {LiveMatch}");
+            Console.WriteLine($"ReadyNotificationTimer {ReadyNotificationTimer}");
+        }
+
         public void Start()
         {
             LiveMatch.Match.CT.UnReadyPlayers();

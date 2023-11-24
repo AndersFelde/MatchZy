@@ -80,6 +80,19 @@ namespace Get5
         }
 
         public MapList MapList { get; set; }
+
+        public void Debug()
+        {
+            Team1.Debug();
+            Team2.Debug();
+            ChatMessage.SendConsoleMessage($"NumMaps: {NumMaps}");
+            ChatMessage.SendConsoleMessage($"MinPlayersToReady: {MinPlayersToReady}");
+            ChatMessage.SendConsoleMessage($"VoteFirst: {VoteFirst}");
+            ChatMessage.SendConsoleMessage($"MapSides: {MapSides}");
+            ChatMessage.SendConsoleMessage($"VoteMode: {VoteMode}");
+            ChatMessage.SendConsoleMessage($"MatchTitle: {MatchTitle}");
+            MapList.Debug();
+        }
         public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)
         {
             this.Team1 = Team.LoadFromJson(teamName1);

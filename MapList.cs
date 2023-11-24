@@ -1,12 +1,18 @@
+using System.Diagnostics;
+
 namespace Get5
 {
     public class MapList
     {
+        public List<string> maps = new();
         public MapList(List<string>? maps = null)
         {
             this.maps = maps ?? new List<string>();
         }
-        public List<string> maps = new();
+        public void Debug()
+        {
+            ChatMessage.SendConsoleMessage(string.Join(", ", maps));
+        }
         public bool HasMap(string mapName)
         {
             return maps.Contains(mapName);

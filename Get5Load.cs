@@ -33,7 +33,7 @@ namespace Get5
         public override void Load(bool hotReload)
         {
 
-            ChatMessage.SendConsoleMessage("GET5 plugin live!");
+            ChatMessage.SendConsoleMessage("-------------------- GET5 plugin live! ----------------------");
             // if (LiveMatch == null)
             // {
             //     return;

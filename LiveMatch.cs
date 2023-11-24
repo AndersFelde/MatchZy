@@ -9,6 +9,7 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Timers;
 using System.Runtime.CompilerServices;
 using System.Net;
+using System.Diagnostics;
 namespace Get5
 {
     public partial class LiveMatch
@@ -31,6 +32,20 @@ namespace Get5
 
         public DamageInfo DamageInfo { get; set; }
         public Warmup Warmup { get; set; }
+
+        public void Debug(){
+            Console.WriteLine("LiveMatch DEBUG");
+            Console.WriteLine($"IsLive {IsLive}");
+            Console.WriteLine($"IsPaused {IsPaused}");
+            Console.WriteLine($"IsKnifeRound {IsKnifeRound}");
+            Console.WriteLine($"IsWarmup {IsWarmup}");
+            Console.WriteLine($"IsMapVote {IsMapVote}");
+            Get5.Debug();
+            Match.Debug();
+            MapVote.Debug();
+            KnifeRound.Debug();
+            Warmup.Debug();
+        }
 
         public LiveMatch(Match match, Get5 get5)
         {

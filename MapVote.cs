@@ -14,7 +14,6 @@ namespace Get5
 {
     public class MapVote
     {
-        public MapList MapList { get; set; }
         private MapList AvailableMaps { get; set; }
 
         public MapList PickedMaps { get; set; } = new MapList();
@@ -31,14 +30,12 @@ namespace Get5
 
         public bool VoteFinished = false;
 
-        public int NumberOfMaps = 1;
 
         private LiveMatch LiveMatch { get; set; }
 
         public MapVote(MapList mapList, LiveMatch liveMatch)
         {
-            this.MapList = mapList;
-            this.AvailableMaps = this.MapList;
+            this.AvailableMaps = mapList;
             this.LiveMatch = liveMatch;
             if (LiveMatch.Match.VoteFirst == "random")
             {
@@ -71,6 +68,21 @@ namespace Get5
             {
                 Is_ban = false;
             }
+        }
+
+        public void Debug()
+        {
+            Console.WriteLine("MapVote DEBUG");
+            Console.WriteLine($"T_turn {T_turn}");
+            Console.WriteLine($"vote_counter {vote_counter}");
+            Console.WriteLine($"Is_ban {Is_ban}");
+            Console.WriteLine($"VoteActive {VoteActive}");
+            Console.WriteLine($"VoteFinished {VoteFinished}");
+            Console.WriteLine($"AvailableMaps");
+            AvailableMaps.Debug();
+            Console.WriteLine($"PickedMaps");
+            PickedMaps.Debug();
+
         }
 
         public void Start()
@@ -111,7 +123,7 @@ namespace Get5
                     if (AvailableMaps.HasMap(map))
                     {
                         // hvis man bare spiller ett map, banner man til ett map er igjen
-                        if (ban || NumberOfMaps == 1)
+                        if (ban || LiveMatch.Match.NumMaps == 1)
                         {
                             AvailableMaps.Remove(map);
                         }
@@ -127,12 +139,12 @@ namespace Get5
                             FlipVoteMode();
                         }
 
-                        if (AvailableMaps.Count() + PickedMaps.Count() == NumberOfMaps)
+                        if (AvailableMaps.Count() + PickedMaps.Count() == LiveMatch.Match.NumMaps)
                         {
                             PickedMaps.Append(AvailableMaps);
                         }
 
-                        if (PickedMaps.Count() == NumberOfMaps)
+                        if (PickedMaps.Count() == LiveMatch.Match.NumMaps)
                         {
                             VoteFinished = true;
                             ChatMessage.SendAllChatMessage("Vote is finished!");

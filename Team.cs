@@ -26,6 +26,13 @@ namespace Get5
                 _playerSteamID = value;
             }
         }
+        public void Debug()
+        {
+            ChatMessage.SendConsoleMessage($"IsReady {IsReady}");
+            ChatMessage.SendConsoleMessage($"Name {Name}");
+            ChatMessage.SendConsoleMessage($"SteamID {SteamID}");
+            ChatMessage.SendConsoleMessage($"PlayerController {PlayerController}");
+        }
         public Player(string name, ulong steamID, CCSPlayerController? playerController = null)
         {
             this.Name = name;
@@ -78,6 +85,19 @@ namespace Get5
 
         public List<Player> Players { get; set; } = new List<Player>();
 
+        public void Debug()
+        {
+            ChatMessage.SendConsoleMessage($"TeamName {TeamName}");
+            ChatMessage.SendConsoleMessage($"TeamFlag {TeamFlag}");
+            ChatMessage.SendConsoleMessage($"TeamTag {TeamTag}");
+            ChatMessage.SendConsoleMessage($"IsPaused {IsPaused}");
+            ChatMessage.SendConsoleMessage($"CSTeam {CSTeam}");
+            ChatMessage.SendConsoleMessage($"Score {Score}");
+            foreach (var player in Players)
+            {
+                player.Debug();
+            }
+        }
         public Team(string teamName, string teamFlag, string teamTag, List<Player> players)
         {
             this.TeamName = teamName;
