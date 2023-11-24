@@ -18,9 +18,9 @@ namespace Get5
         private bool IsLive = false;
         private bool IsPaused = false;
         private bool IsKnifeRound = false;
-        private bool IsWarmup = true;
+        private bool IsWarmup = false;
 
-        private bool IsMapVote = true;
+        private bool IsMapVote = false;
 
 
 
@@ -33,13 +33,14 @@ namespace Get5
         public DamageInfo DamageInfo { get; set; }
         public Warmup Warmup { get; set; }
 
-        public void Debug(){
-            Console.WriteLine("LiveMatch DEBUG");
-            Console.WriteLine($"IsLive {IsLive}");
-            Console.WriteLine($"IsPaused {IsPaused}");
-            Console.WriteLine($"IsKnifeRound {IsKnifeRound}");
-            Console.WriteLine($"IsWarmup {IsWarmup}");
-            Console.WriteLine($"IsMapVote {IsMapVote}");
+        public void Debug()
+        {
+            ChatMessage.SendConsoleMessage("LiveMatch DEBUG");
+            ChatMessage.SendConsoleMessage($"IsLive {IsLive}");
+            ChatMessage.SendConsoleMessage($"IsPaused {IsPaused}");
+            ChatMessage.SendConsoleMessage($"IsKnifeRound {IsKnifeRound}");
+            ChatMessage.SendConsoleMessage($"IsWarmup {IsWarmup}");
+            ChatMessage.SendConsoleMessage($"IsMapVote {IsMapVote}");
             Match.Debug();
             MapVote.Debug();
             KnifeRound.Debug();
@@ -56,6 +57,13 @@ namespace Get5
             this.DamageInfo = new DamageInfo(this);
             this.Warmup = new Warmup(this);
             StartWarmup();
+        }
+        private void AssignJoinedPlayers()
+        {
+            foreach (CCSPlayerController player in Get5.playerData.Values)
+            {
+                PlayerConnectHook(player);
+            }
         }
         public (int alivePlayers, int totalHealth) GetAlivePlayers(bool terrorists = false, bool CT = false)
         {
@@ -87,6 +95,7 @@ namespace Get5
 
         public void StartWarmup()
         {
+            AssignJoinedPlayers();
             Warmup.Start();
             IsWarmup = true;
         }
@@ -123,7 +132,7 @@ namespace Get5
             MapVote.End();
             IsMapVote = false;
             ChangeToNextMap();
-            StartKnifeRound();
+            StartWarmup();
         }
 
         public void StartKnifeRound()
@@ -151,6 +160,7 @@ namespace Get5
         public void StartLive()
         {
             IsLive = true;
+            Server.ExecuteCommand("exec comp");
             Server.ExecuteCommand("exec live");
             ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
             ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");

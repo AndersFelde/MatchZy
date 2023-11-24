@@ -19,8 +19,8 @@ namespace Get5
     {
         public static void Debug()
         {
-            Console.WriteLine("ChatCommands DEBUG");
-            Console.WriteLine($"CommandActions {string.Join(", ", CommandActions.Keys)}");
+            ChatMessage.SendConsoleMessage("ChatCommands DEBUG");
+            ChatMessage.SendConsoleMessage($"CommandActions {string.Join(", ", CommandActions.Keys)}");
         }
 
         static public Dictionary<string, Action<CCSPlayerController, List<string>, LiveMatch>> CommandActions = new()

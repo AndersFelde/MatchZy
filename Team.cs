@@ -56,7 +56,7 @@ namespace Get5
             if (PlayerController != null)
             {
                 ChatMessage.SendPlayerChatMessage(PlayerController, "You are now ready");
-                PlayerController.Clan = "[READY]";
+                // PlayerController.Clan = "[READY]";
             }
         }
 
@@ -66,7 +66,7 @@ namespace Get5
             if (PlayerController != null)
             {
                 ChatMessage.SendPlayerChatMessage(PlayerController, "You are not ready");
-                PlayerController.Clan = "[NOT READY]";
+                // PlayerController.Clan = "[NOT READY]";
             }
         }
     }

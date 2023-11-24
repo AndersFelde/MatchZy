@@ -12,7 +12,7 @@ namespace Get5
         public void Debug()
         {
             ChatMessage.SendConsoleMessage("MapList DEBUG");
-            ChatMessage.SendConsoleMessage(string.Join(", ", maps));
+            ChatMessage.SendConsoleMessage(this.ToString());
         }
         public bool HasMap(string mapName)
         {

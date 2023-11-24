@@ -62,9 +62,8 @@ namespace Get5
         }
 
 
-        public void PlayerConnectHook(EventPlayerConnectFull @event)
+        public void PlayerConnectHook(CCSPlayerController player)
         {
-            var player = @event.Userid;
             if (Match.CT.HasPlayer(player))
             {
                 Match.CT.JoinPlayer(player);
@@ -79,9 +78,8 @@ namespace Get5
             }
 
         }
-        public void PlayerDisconnectHook(EventPlayerDisconnect @event)
+        public void PlayerDisconnectHook(CCSPlayerController player)
         {
-            var player = @event.Userid;
             if (Match.CT.HasPlayer(player))
             {
                 Match.CT.DisconnectPlayer(player);

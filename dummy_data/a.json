@@ -3,7 +3,7 @@
     "teamName2": "TeamB",
     "matchTitle": "TeamA vs TeamB",
     "numMaps": 1,
-    "minPlayersToReady": 5,
+    "minPlayersToReady": 1,
     "voteFirst": "random",
     "mapSides": "knife",
     "voteMode": "ban",

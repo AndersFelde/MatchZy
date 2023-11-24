@@ -18,6 +18,8 @@ namespace Get5
 
         public MapList PickedMaps { get; set; } = new MapList();
 
+        public MapList BannedMaps { get; set; } = new MapList();
+
         private CounterStrikeSharp.API.Modules.Timers.Timer? VoteUpdateTimer;
 
         private bool T_turn = true;
@@ -72,15 +74,15 @@ namespace Get5
 
         public void Debug()
         {
-            Console.WriteLine("MapVote DEBUG");
-            Console.WriteLine($"T_turn {T_turn}");
-            Console.WriteLine($"vote_counter {vote_counter}");
-            Console.WriteLine($"Is_ban {Is_ban}");
-            Console.WriteLine($"VoteActive {VoteActive}");
-            Console.WriteLine($"VoteFinished {VoteFinished}");
-            Console.WriteLine($"AvailableMaps");
+            ChatMessage.SendConsoleMessage("MapVote DEBUG");
+            ChatMessage.SendConsoleMessage($"T_turn {T_turn}");
+            ChatMessage.SendConsoleMessage($"vote_counter {vote_counter}");
+            ChatMessage.SendConsoleMessage($"Is_ban {Is_ban}");
+            ChatMessage.SendConsoleMessage($"VoteActive {VoteActive}");
+            ChatMessage.SendConsoleMessage($"VoteFinished {VoteFinished}");
+            ChatMessage.SendConsoleMessage($"AvailableMaps");
             AvailableMaps.Debug();
-            Console.WriteLine($"PickedMaps");
+            ChatMessage.SendConsoleMessage($"PickedMaps");
             PickedMaps.Debug();
 
         }
@@ -89,7 +91,8 @@ namespace Get5
         {
             VoteActive = true;
             ChatMessage.SendAllChatMessage("Map vote started!");
-            VoteUpdateTimer = Utils.CreateContinousChatUpdate(PrintVoteStatus, LiveMatch.Get5);
+            PrintVoteStatus();
+            VoteUpdateTimer = Utils.CreateContinousChatUpdate(PrintVoteStatus, LiveMatch.Get5, seconds: 30);
             Server.ExecuteCommand("sv_pausable 1");
             Server.ExecuteCommand("pause");
         }
@@ -98,7 +101,7 @@ namespace Get5
         {
             ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
             ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
-            ChatMessage.SendAllChatMessage($"Banned maps: {PickedMaps}");
+            ChatMessage.SendAllChatMessage($"Banned maps: {BannedMaps}");
             string teamTurnMsg = "CT";
             if (T_turn)
             {
@@ -123,9 +126,10 @@ namespace Get5
                     if (AvailableMaps.HasMap(map))
                     {
                         // hvis man bare spiller ett map, banner man til ett map er igjen
+                        AvailableMaps.Remove(map);
                         if (ban || LiveMatch.Match.NumMaps == 1)
                         {
-                            AvailableMaps.Remove(map);
+                            BannedMaps.Add(map);
                         }
                         else
                         {
@@ -189,6 +193,7 @@ namespace Get5
             VoteUpdateTimer?.Kill();
             VoteUpdateTimer = null;
             VoteActive = false;
+            VoteFinished = true;
             Server.ExecuteCommand("unpause");
             Server.ExecuteCommand("sv_pausable 0");
         }

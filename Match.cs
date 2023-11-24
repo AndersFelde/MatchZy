@@ -100,7 +100,7 @@ namespace Get5
             this.Team2 = Team.LoadFromJson(teamName2);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
-            this.MinPlayersToReady = MinPlayersToReady;
+            this.MinPlayersToReady = minPlayersToReady;
             this.VoteFirst = voteFirst;
             this.MapSides = mapSides;
             this.VoteMode = voteMode;

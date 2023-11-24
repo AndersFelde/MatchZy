@@ -18,12 +18,15 @@ namespace Get5
         public bool T_won = false;
         public bool CT_won = false;
 
+        private string winning_team = "";
+
         private LiveMatch LiveMatch { get; set; }
 
         public KnifeRound(LiveMatch liveMatch)
         {
             this.LiveMatch = liveMatch;
         }
+        private CounterStrikeSharp.API.Modules.Timers.Timer? StaySwitchTimer;
 
         public void Start()
         {
@@ -86,9 +89,23 @@ namespace Get5
                 finalEvent = 9;
             }
             @event.FinalEvent = finalEvent;
-            ChatMessage.SendAllChatMessage("Winning team choose to stay or switch");
-
+            if (T_won)
+            {
+                winning_team = "Terrorists";
+            }
+            else
+            {
+                winning_team = "CT";
+            }
+            Utils.CreateContinousChatUpdate(SendSwitchStayMessage, LiveMatch.Get5, 30);
         }
+
+        public void SendSwitchStayMessage()
+        {
+            ChatMessage.SendAllChatMessage($"{winning_team} choose to stay or switch");
+            ChatMessage.SendAllChatMessage($"Send .switch or .stay");
+        }
+
         public void HandleKnifeRoundChat(CCSPlayerController player, bool stay)
         {
             if (KnifeActive)

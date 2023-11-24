@@ -24,16 +24,19 @@ namespace Get5
 
         public void Debug()
         {
-            Console.WriteLine("Warmup DEBUG");
-            Console.WriteLine($"LiveMatch {LiveMatch}");
-            Console.WriteLine($"ReadyNotificationTimer {ReadyNotificationTimer}");
+            ChatMessage.SendConsoleMessage("Warmup DEBUG");
+            ChatMessage.SendConsoleMessage($"LiveMatch {LiveMatch}");
+            ChatMessage.SendConsoleMessage($"ReadyNotificationTimer {ReadyNotificationTimer}");
+            ChatMessage.SendConsoleMessage($"CT ready players {LiveMatch.Match.CT.ReadyPlayers()}");
+            ChatMessage.SendConsoleMessage($"T ready players {LiveMatch.Match.Terrorists.ReadyPlayers()}");
         }
 
         public void Start()
         {
             LiveMatch.Match.CT.UnReadyPlayers();
             LiveMatch.Match.Terrorists.UnReadyPlayers();
-            ReadyNotificationTimer = Utils.CreateContinousChatUpdate(SendUnreadyPlayersMessage, LiveMatch.Get5);
+            ReadyNotificationTimer = Utils.CreateContinousChatUpdate(SendPlayersStatusMessage, LiveMatch.Get5, seconds: 30);
+            SendPlayersStatusMessage();
             ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
             ChatMessage.SendAllChatMessage("Send '.ready' to ready");
             Server.ExecuteCommand("exec warmup");
@@ -43,10 +46,11 @@ namespace Get5
         {
             // TODO: Print all ready players
             LiveMatch.Match.GetPlayer(player)?.Ready();
-            if ((LiveMatch.Match.CT.ReadyPlayers() > LiveMatch.Match.MinPlayersToReady) && (LiveMatch.Match.CT.ReadyPlayers() > LiveMatch.Match.MinPlayersToReady))
+            if ((LiveMatch.Match.CT.ReadyPlayers() >= LiveMatch.Match.MinPlayersToReady) && (LiveMatch.Match.Terrorists.ReadyPlayers() >= LiveMatch.Match.MinPlayersToReady))
             {
                 LiveMatch.EndWarmup();
             }
+            SendPlayersStatusMessage();
         }
 
 
@@ -54,6 +58,7 @@ namespace Get5
         {
             // TODO: Print all unready players
             LiveMatch.Match.GetPlayer(player)?.UnReady();
+            SendPlayersStatusMessage();
         }
 
         public void End()
@@ -62,7 +67,7 @@ namespace Get5
             ReadyNotificationTimer = null;
         }
 
-        public void SendUnreadyPlayersMessage()
+        public void SendPlayersStatusMessage()
         {
 
             foreach (var player in LiveMatch.Match.CT.Players)

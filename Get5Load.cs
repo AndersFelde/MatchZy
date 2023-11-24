@@ -41,20 +41,19 @@ namespace Get5
 
             RegisterEventHandler<EventPlayerConnectFull>((@event, info) =>
             {
-                if (LiveMatch == null) return HookResult.Continue;
-                Utils.Log($"[FULL CONNECT] Player ID: {@event.Userid.UserId}, Name: {@event.Userid.PlayerName} has connected!");
                 //To fix player not beeing passed in chat event
                 if (PlayerIsValid(@event.Userid)) playerData[@event.Userid.UserId.Value] = @event.Userid;
-                LiveMatch?.PlayerConnectHook(@event);
+                if (LiveMatch == null) return HookResult.Continue;
+                LiveMatch?.PlayerConnectHook(@event.Userid);
                 return HookResult.Continue;
             });
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
             {
-                if (LiveMatch == null) return HookResult.Continue;
                 //To fix player not beeing passed in chat event
                 if (PlayerIsValid(@event.Userid)) playerData.Remove(@event.Userid.UserId.Value);
-                LiveMatch?.PlayerDisconnectHook(@event);
+                if (LiveMatch == null) return HookResult.Continue;
+                LiveMatch?.PlayerDisconnectHook(@event.Userid);
                 return HookResult.Continue;
             });
 

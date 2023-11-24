@@ -21,9 +21,9 @@ namespace Get5
         public static string ConfigPath = Path.Join(Server.GameDirectory + "/csgo/cfg/get5/");
         public static void Debug()
         {
-            Console.WriteLine("Globals DEBUG");
-            Console.WriteLine($"TeamNumLookup {TeamNumLookup}");
-            Console.WriteLine($"ConfigPath {ConfigPath}");
+            ChatMessage.SendConsoleMessage("Globals DEBUG");
+            ChatMessage.SendConsoleMessage($"TeamNumLookup {TeamNumLookup}");
+            ChatMessage.SendConsoleMessage($"ConfigPath {ConfigPath}");
         }
     }
 
@@ -74,9 +74,9 @@ namespace Get5
             return File.ReadAllText(path);
         }
 
-        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateContinousChatUpdate(Action callback, Get5 get5)
+        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateContinousChatUpdate(Action callback, Get5 get5, int seconds = 12)
         {
-            return get5.AddTimer(12, callback, TimerFlags.REPEAT);
+            return get5.AddTimer(seconds, callback, TimerFlags.REPEAT);
         }
 
     }
