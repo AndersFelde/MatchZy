@@ -62,15 +62,14 @@ namespace Get5
         }
         public static string ReadConfigFile(string filename, bool json = true)
         {
-            // string data;
             filename += json ? ".json" : "";
             var path = Path.Join(Globals.ConfigPath, filename);
             return File.ReadAllText(path);
-            // using (var r = new StreamReader(Globals.ConfigPath + filename))
-            // {
-            //     data = r.ReadToEnd();
-            // }
-            // return data;
+        }
+
+        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateContinousChatUpdate(Action callback, Get5 get5)
+        {
+            return get5.AddTimer(12, callback, TimerFlags.REPEAT);
         }
 
     }

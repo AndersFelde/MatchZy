@@ -23,13 +23,14 @@ namespace Get5
 
 
 
-        private Get5 Get5 { get; set; }
+        public Get5 Get5 { get; set; }
         public Match Match { get; set; }
 
         public MapVote MapVote { get; set; }
         public KnifeRound KnifeRound { get; set; }
 
         public DamageInfo DamageInfo { get; set; }
+        public Warmup Warmup { get; set; }
 
         public LiveMatch(Match match, Get5 get5)
         {
@@ -39,6 +40,7 @@ namespace Get5
             this.MapVote = new MapVote(mapList: this.Match.MapList, liveMatch: this);
             this.KnifeRound = new KnifeRound(this);
             this.DamageInfo = new DamageInfo(this);
+            this.Warmup = new Warmup(this);
             StartWarmup();
         }
         public (int alivePlayers, int totalHealth) GetAlivePlayers(bool terrorists = false, bool CT = false)
@@ -71,16 +73,13 @@ namespace Get5
 
         public void StartWarmup()
         {
-            Match.CT.UnReadyPlayers();
-            Match.Terrorists.UnReadyPlayers();
-            ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
-            ChatMessage.SendAllChatMessage("Send '.ready' to ready");
+            Warmup.Start();
             IsWarmup = true;
-            Server.ExecuteCommand("exec warmup");
         }
 
         public void EndWarmup()
         {
+            Warmup.End();
             IsWarmup = false;
             if (MapVote.VoteFinished)
             {
@@ -94,11 +93,8 @@ namespace Get5
 
         public void StartMapVote()
         {
-            ChatMessage.SendAllChatMessage("Captains, prepare to vote for maps");
+            MapVote.Start();
             IsMapVote = true;
-            MapVote.VoteActive = true;
-            Server.ExecuteCommand("sv_pausable 1");
-            Server.ExecuteCommand("pause");
         }
         private void ChangeToNextMap()
         {
@@ -110,10 +106,8 @@ namespace Get5
 
         public void EndMapVote()
         {
+            MapVote.End();
             IsMapVote = false;
-            MapVote.VoteActive = false;
-            Server.ExecuteCommand("unpause");
-            Server.ExecuteCommand("sv_pausable 0");
             ChangeToNextMap();
             StartKnifeRound();
         }
@@ -122,30 +116,20 @@ namespace Get5
         {
             if (Match.MapSides == "knife")
             {
-                ChatMessage.SendAllChatMessage("Knife round is starting!");
+                KnifeRound.Start();
                 IsKnifeRound = true;
-                KnifeRound.KnifeActive = true;
-                Server.ExecuteCommand("exec knife");
 
             }
             else
             {
-                if (Match.MapSides == "stay")
-                {
-                    ChatMessage.SendAllChatMessage("CT will stay on CT side");
-                }
-                else if (Match.MapSides == "switch")
-                {
-                    ChatMessage.SendAllChatMessage("CT will switch to T side");
-                    SwapTeams();
-                }
+                StartLive();
             }
         }
 
         public void EndKnifeRound()
         {
             IsKnifeRound = false;
-            KnifeRound.KnifeActive = false;
+            KnifeRound.End();
             StartLive();
         }
 

@@ -25,6 +25,18 @@ namespace Get5
             this.LiveMatch = liveMatch;
         }
 
+        public void Start()
+        {
+            ChatMessage.SendAllChatMessage("Knife round is starting!");
+            KnifeActive = true;
+            Server.ExecuteCommand("exec knife");
+        }
+
+        public void End()
+        {
+            KnifeActive = false;
+        }
+
         public void HandleKnifeRoundEnd(EventCsWinPanelRound @event)
         {
             (int tAlive, int tHealth) = LiveMatch.GetAlivePlayers(terrorists: true);

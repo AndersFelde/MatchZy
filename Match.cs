@@ -82,9 +82,8 @@ namespace Get5
         public MapList MapList { get; set; }
         public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)
         {
-            // WARN: team1 is terrorist and team2 is CT ensures that MapVote goes in the correct order
-            this.Terrorists = this.Team1 = Team.LoadFromJson(teamName1);
-            this.CT = this.Team2 = Team.LoadFromJson(teamName2);
+            this.Team1 = Team.LoadFromJson(teamName1);
+            this.Team2 = Team.LoadFromJson(teamName2);
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = MinPlayersToReady;
@@ -92,6 +91,19 @@ namespace Get5
             this.MapSides = mapSides;
             this.VoteMode = voteMode;
             this.MapList = mapList;
+
+            // WARN: team1 is terrorist and team2 is CT ensures that MapVote goes in the correct order
+            if (mapSides == "knife" || mapSides == "team2_ct")
+            {
+                this.Terrorists = this.Team1;
+                this.CT = this.Team2;
+            }
+            else
+            {
+                this.CT = this.Team1;
+                this.Terrorists = this.Team2;
+            }
+
         }
         public static Match LoadFromJson(string match_name)
         {

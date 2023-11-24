@@ -61,22 +61,6 @@ namespace Get5
             }
         }
 
-        public void HandleReadyChat(CCSPlayerController player)
-        {
-            // TODO: Print all ready players
-            Match.GetPlayer(player)?.Ready();
-            if ((Match.CT.ReadyPlayers() > Match.MinPlayersToReady) && (Match.CT.ReadyPlayers() > Match.MinPlayersToReady))
-            {
-                EndWarmup();
-            }
-        }
-
-
-        public void HandleUnReadyChat(CCSPlayerController player)
-        {
-            // TODO: Print all unready players
-            Match.GetPlayer(player)?.UnReady();
-        }
 
         public void PlayerConnectHook(EventPlayerConnectFull @event)
         {

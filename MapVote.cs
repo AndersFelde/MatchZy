@@ -19,6 +19,8 @@ namespace Get5
 
         public MapList PickedMaps { get; set; } = new MapList();
 
+        private CounterStrikeSharp.API.Modules.Timers.Timer? VoteUpdateTimer;
+
         private bool T_turn = true;
 
         private int vote_counter = 0;
@@ -71,6 +73,34 @@ namespace Get5
             }
         }
 
+        public void Start()
+        {
+            VoteActive = true;
+            ChatMessage.SendAllChatMessage("Map vote started!");
+            VoteUpdateTimer = Utils.CreateContinousChatUpdate(PrintVoteStatus, LiveMatch.Get5);
+            Server.ExecuteCommand("sv_pausable 1");
+            Server.ExecuteCommand("pause");
+        }
+
+        private void PrintVoteStatus()
+        {
+            ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
+            ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
+            ChatMessage.SendAllChatMessage($"Banned maps: {PickedMaps}");
+            string teamTurnMsg = "CT";
+            if (T_turn)
+            {
+                teamTurnMsg = "Terrorists";
+
+            }
+            string voteModeMsg = "pick";
+            if (Is_ban)
+            {
+                voteModeMsg = "ban";
+            }
+            ChatMessage.SendAllChatMessage($"{teamTurnMsg} needs to {voteModeMsg} a map");
+        }
+
         public void HandleMapVoteChat(CCSPlayerController player, List<string> commandArgs, bool ban)
         {
             if (!this.VoteFinished)
@@ -97,11 +127,6 @@ namespace Get5
                             FlipVoteMode();
                         }
 
-
-                        ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
-                        ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
-                        ChatMessage.SendAllChatMessage($"Banned maps: {PickedMaps}");
-
                         if (AvailableMaps.Count() + PickedMaps.Count() == NumberOfMaps)
                         {
                             PickedMaps.Append(AvailableMaps);
@@ -112,14 +137,15 @@ namespace Get5
                             VoteFinished = true;
                             ChatMessage.SendAllChatMessage("Vote is finished!");
                             LiveMatch.EndMapVote();
+                            return;
                         }
 
+                        PrintVoteStatus();
 
                     }
                     else
                     {
                         ChatMessage.SendPlayerChatMessage(player, "Map not available!");
-                        ChatMessage.SendPlayerChatMessage(player, $"Available maps: {AvailableMaps}");
                     }
 
                 }
@@ -145,9 +171,14 @@ namespace Get5
         {
             T_turn = !T_turn;
         }
-        public void PrintAvailableMaps()
+
+        public void End()
         {
-            ChatMessage.SendAllChatMessage($"Available maps: {AvailableMaps}");
+            VoteUpdateTimer?.Kill();
+            VoteUpdateTimer = null;
+            VoteActive = false;
+            Server.ExecuteCommand("unpause");
+            Server.ExecuteCommand("sv_pausable 0");
         }
     }
 }
