@@ -17,6 +17,11 @@ namespace Get5
 {
     class ChatCommands
     {
+        public static void Debug()
+        {
+            Console.WriteLine("ChatCommands DEBUG");
+            Console.WriteLine($"CommandActions {string.Join(", ", CommandActions.Keys)}");
+        }
 
         static public Dictionary<string, Action<CCSPlayerController, List<string>, LiveMatch>> CommandActions = new()
         {

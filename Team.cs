@@ -87,6 +87,7 @@ namespace Get5
 
         public void Debug()
         {
+            ChatMessage.SendConsoleMessage("Team DEBUG");
             ChatMessage.SendConsoleMessage($"TeamName {TeamName}");
             ChatMessage.SendConsoleMessage($"TeamFlag {TeamFlag}");
             ChatMessage.SendConsoleMessage($"TeamTag {TeamTag}");

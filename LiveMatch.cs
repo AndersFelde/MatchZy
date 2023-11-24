@@ -40,7 +40,6 @@ namespace Get5
             Console.WriteLine($"IsKnifeRound {IsKnifeRound}");
             Console.WriteLine($"IsWarmup {IsWarmup}");
             Console.WriteLine($"IsMapVote {IsMapVote}");
-            Get5.Debug();
             Match.Debug();
             MapVote.Debug();
             KnifeRound.Debug();

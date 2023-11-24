@@ -83,14 +83,15 @@ namespace Get5
 
         public void Debug()
         {
-            Team1.Debug();
-            Team2.Debug();
+            ChatMessage.SendConsoleMessage("Match DEBUG");
+            ChatMessage.SendConsoleMessage($"MatchTitle: {MatchTitle}");
             ChatMessage.SendConsoleMessage($"NumMaps: {NumMaps}");
             ChatMessage.SendConsoleMessage($"MinPlayersToReady: {MinPlayersToReady}");
             ChatMessage.SendConsoleMessage($"VoteFirst: {VoteFirst}");
             ChatMessage.SendConsoleMessage($"MapSides: {MapSides}");
             ChatMessage.SendConsoleMessage($"VoteMode: {VoteMode}");
-            ChatMessage.SendConsoleMessage($"MatchTitle: {MatchTitle}");
+            Team1.Debug();
+            Team2.Debug();
             MapList.Debug();
         }
         public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)

@@ -43,19 +43,6 @@ namespace Get5
             LiveMatch = null;
         }
 
-        [RequiresPermissions("@css/generic")]
-        [ConsoleCommand("get5_help", "Get help for get5 commands")]
-        [CommandHelper(minArgs: 0, usage: "", whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
-        public void get5_help(CCSPlayerController? player, CommandInfo command)
-        {
-            ChatMessage.SendConsoleMessage("Available commands:");
-            ChatMessage.SendConsoleMessage("get5");
-            ChatMessage.SendConsoleMessage("get5_start {match_name}");
-            ChatMessage.SendConsoleMessage("get5_stop");
-            ChatMessage.SendConsoleMessage("get5_help");
-
-
-        }
 
         [RequiresPermissions("@css/generic")]
         [ConsoleCommand("get5_debug", "Debug get5 env")]
@@ -65,6 +52,20 @@ namespace Get5
             Debug();
         }
 
+        [RequiresPermissions("@css/generic")]
+        [ConsoleCommand("get5_help", "Get help for get5 commands")]
+        [CommandHelper(minArgs: 0, usage: "", whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
+        public void get5_help(CCSPlayerController? player, CommandInfo command)
+        {
+            ChatMessage.SendConsoleMessage("Available commands:");
+            ChatMessage.SendConsoleMessage("get5");
+            ChatMessage.SendConsoleMessage("get5_start {match_name}");
+            ChatMessage.SendConsoleMessage("get5_stop");
+            ChatMessage.SendConsoleMessage("get5_debug");
+            ChatMessage.SendConsoleMessage("get5_help");
+
+
+        }
 
     }
 

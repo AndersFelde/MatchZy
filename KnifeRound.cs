@@ -129,6 +129,7 @@ namespace Get5
 
         public void Debug()
         {
+            ChatMessage.SendConsoleMessage("KnifeRound DEBUG");
             ChatMessage.SendConsoleMessage($"KnifeActive {KnifeActive}");
             ChatMessage.SendConsoleMessage($"T_won {T_won}");
             ChatMessage.SendConsoleMessage($"CT_won {CT_won}");

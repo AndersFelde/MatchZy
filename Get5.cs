@@ -34,10 +34,12 @@ namespace Get5
 
         public void Debug()
         {
-            Console.WriteLine("LiveMatch DEBUG");
+            Console.WriteLine("Get5 DEBUG");
             Console.WriteLine($"LiveMatch {LiveMatch}");
             Console.WriteLine($"chatPrefix {chatPrefix}");
             Console.WriteLine($"chatCommandPrefix {chatCommandPrefix}");
+            Globals.Debug();
+            ChatCommands.Debug();
             LiveMatch?.Debug();
         }
 

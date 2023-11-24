@@ -19,7 +19,14 @@ namespace Get5
 
     };
         public static string ConfigPath = Path.Join(Server.GameDirectory + "/csgo/cfg/get5/");
+        public static void Debug()
+        {
+            Console.WriteLine("Globals DEBUG");
+            Console.WriteLine($"TeamNumLookup {TeamNumLookup}");
+            Console.WriteLine($"ConfigPath {ConfigPath}");
+        }
     }
+
     class StringChoiceField
     {
         private string _Value = "";
