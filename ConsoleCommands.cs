@@ -57,6 +57,14 @@ namespace Get5
 
         }
 
+        [RequiresPermissions("@css/generic")]
+        [ConsoleCommand("get5_debug", "Debug get5 env")]
+        [CommandHelper(minArgs: 0, usage: "", whoCanExecute: CommandUsage.CLIENT_AND_SERVER)]
+        public void get5_debug(CCSPlayerController? player, CommandInfo command)
+        {
+            Debug();
+        }
+
 
     }
 

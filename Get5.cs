@@ -38,6 +38,7 @@ namespace Get5
             Console.WriteLine($"LiveMatch {LiveMatch}");
             Console.WriteLine($"chatPrefix {chatPrefix}");
             Console.WriteLine($"chatCommandPrefix {chatCommandPrefix}");
+            LiveMatch?.Debug();
         }
 
     }
