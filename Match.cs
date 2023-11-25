@@ -33,6 +33,8 @@ namespace Get5
                 _Terrorists.CSTeam = CsTeam.Terrorist;
             }
         }
+
+        public Team Spectators { get; set; }
         public string MatchTitle { get; set; }
         public int NumMaps { get; set; }
         public int MinPlayersToReady { get; set; }
@@ -52,7 +54,7 @@ namespace Get5
                 _VoteFirst.Value = value;
             }
         }
-        private StringChoiceField _MapSides = new StringChoiceField(new List<string> { "team1_ct", "team2_ct", "knife" });
+        private StringChoiceField _MapSides = new StringChoiceField(new List<string> { "knife" });
         public string MapSides
         {
             get
@@ -92,12 +94,15 @@ namespace Get5
             ChatMessage.SendConsoleMessage($"VoteMode: {VoteMode}");
             Team1.Debug();
             Team2.Debug();
+            Spectators.Debug();
             MapList.Debug();
         }
-        public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, string? matchTitle = null)
+        public Match(string teamName1, string teamName2, int numMaps, int minPlayersToReady, string voteFirst, string mapSides, string voteMode, MapList mapList, List<Player> spectators, string? matchTitle = null)
         {
             this.Team1 = Team.LoadFromJson(teamName1);
             this.Team2 = Team.LoadFromJson(teamName2);
+            this.Spectators = new Team("Spectators", "NO", "SP", spectators);
+            this.Spectators.CSTeam = CsTeam.Spectator;
             this.MatchTitle = matchTitle ?? $"{teamName1} vs {teamName2}";
             this.NumMaps = numMaps;
             this.MinPlayersToReady = minPlayersToReady;
@@ -151,10 +156,14 @@ namespace Get5
                 ? voteModeElement.ToString()
                 : "team1_ban";
 
+            List<Player> spectators = jsonEl.TryGetProperty("spectators", out JsonElement playerListElement)
+                ? playerListElement.EnumerateArray().Select(p => Player.LoadFromRawJson(p.ToString())).ToList()
+                : new List<Player>();
+
             List<string> maps = jsonEl.GetProperty("mapList").EnumerateArray().Select(element => element.ToString()).ToList();
             MapList mapList = new(maps);
 
-            return new Match(teamName1: teamName1, teamName2: teamName2, matchTitle: matchTitle, numMaps: numMaps, minPlayersToReady: minPlayersToReady, voteFirst: voteFirst, mapSides: mapSides, voteMode: voteMode, mapList: mapList);
+            return new Match(teamName1: teamName1, teamName2: teamName2, matchTitle: matchTitle, numMaps: numMaps, minPlayersToReady: minPlayersToReady, voteFirst: voteFirst, mapSides: mapSides, voteMode: voteMode, mapList: mapList, spectators: spectators);
         }
 
         public List<Player> GetAllPlayers()

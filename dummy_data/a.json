@@ -15,5 +15,11 @@
         "de_anubis",
         "de_nuke",
         "de_vertigo"
+    ],
+    "spectators": [
+        {
+            "name": "Raaen",
+            "steamID": 76561198107882253
+        }
     ]
 }

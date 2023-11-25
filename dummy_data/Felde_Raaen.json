@@ -1,0 +1,20 @@
+{
+    "teamName1": "Felde",
+    "teamName2": "Raaen",
+    "matchTitle": "Felde vs Raaen",
+    "numMaps": 1,
+    "minPlayersToReady": 1,
+    "voteFirst": "random",
+    "mapSides": "knife",
+    "voteMod": "ban",
+    "mapList": [
+        "de_nuke",
+        "de_inferno",
+        "de_mirage",
+        "de_overpass",
+        "de_vertigo",
+        "de_ancient",
+        "de_anubis"
+    ],
+    "spectators": []
+}

@@ -92,6 +92,10 @@ namespace Get5
             {
                 Match.Terrorists.JoinPlayer(player);
             }
+            else if (Match.Spectators.HasPlayer(player))
+            {
+                Match.Spectators.JoinPlayer(player);
+            }
             else
             {
                 Server.ExecuteCommand($"kickid {player.UserId}");
