@@ -74,7 +74,7 @@ namespace Get5
             return File.ReadAllText(path);
         }
 
-        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateContinousChatUpdate(Action callback, Get5 get5, int seconds = 12)
+        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateContinousChatUpdate(Action callback, Get5 get5, int seconds = 30)
         {
             return get5.AddTimer(seconds, callback, TimerFlags.REPEAT);
         }

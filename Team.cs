@@ -173,7 +173,7 @@ namespace Get5
         public void JoinPlayer(CCSPlayerController player)
         {
             GetPlayer(player.SteamID).PlayerController = player;
-            player.ChangeTeam(CSTeam);
+            player.SwitchTeam(CSTeam);
         }
 
         public void DisconnectPlayer(CCSPlayerController player)

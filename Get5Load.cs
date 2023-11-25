@@ -57,11 +57,12 @@ namespace Get5
                 return HookResult.Continue;
             });
 
-            RegisterEventHandler<EventGameEnd>((@event, info) =>
+            // TODO: Se på trigger for game end
+            RegisterListener<Listeners.OnMapEnd>(() =>
             {
-                if (LiveMatch == null) return HookResult.Continue;
-                LiveMatch?.GameEndHook(@event);
-                return HookResult.Continue;
+                // if (LiveMatch != null) return HookResult.Continue;
+                LiveMatch?.GameEndHook();
+                // return HookResult.Continue;
             });
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>

@@ -32,12 +32,15 @@ namespace Get5
         {
             ChatMessage.SendAllChatMessage("Knife round is starting!");
             KnifeActive = true;
+            Server.ExecuteCommand("exec comp");
             Server.ExecuteCommand("exec knife");
         }
 
         public void End()
         {
             KnifeActive = false;
+            StaySwitchTimer?.Kill();
+            StaySwitchTimer = null;
         }
 
         public void HandleKnifeRoundEnd(EventCsWinPanelRound @event)
@@ -97,7 +100,8 @@ namespace Get5
             {
                 winning_team = "CT";
             }
-            Utils.CreateContinousChatUpdate(SendSwitchStayMessage, LiveMatch.Get5, 30);
+            StaySwitchTimer = Utils.CreateContinousChatUpdate(SendSwitchStayMessage, LiveMatch.Get5, 30);
+            SendSwitchStayMessage();
         }
 
         public void SendSwitchStayMessage()

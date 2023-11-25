@@ -16,6 +16,8 @@ namespace Get5
     public class Warmup
     {
         public LiveMatch LiveMatch;
+
+        public bool IsWarmup = false;
         private CounterStrikeSharp.API.Modules.Timers.Timer? ReadyNotificationTimer;
         public Warmup(LiveMatch liveMatch)
         {
@@ -36,33 +38,38 @@ namespace Get5
             LiveMatch.Match.CT.UnReadyPlayers();
             LiveMatch.Match.Terrorists.UnReadyPlayers();
             ReadyNotificationTimer = Utils.CreateContinousChatUpdate(SendPlayersStatusMessage, LiveMatch.Get5, seconds: 30);
+            IsWarmup = true;
             SendPlayersStatusMessage();
             ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
             ChatMessage.SendAllChatMessage("Send '.ready' to ready");
-            Server.ExecuteCommand("exec warmup");
+            Server.ExecuteCommand("exec prac");
         }
 
         public void HandleReadyChat(CCSPlayerController player)
         {
-            // TODO: Print all ready players
+            if (!IsWarmup) return;
             LiveMatch.Match.GetPlayer(player)?.Ready();
             if ((LiveMatch.Match.CT.ReadyPlayers() >= LiveMatch.Match.MinPlayersToReady) && (LiveMatch.Match.Terrorists.ReadyPlayers() >= LiveMatch.Match.MinPlayersToReady))
             {
                 LiveMatch.EndWarmup();
             }
-            SendPlayersStatusMessage();
+            else
+            {
+                SendPlayersStatusMessage();
+            }
         }
 
 
         public void HandleUnReadyChat(CCSPlayerController player)
         {
-            // TODO: Print all unready players
+            if (!IsWarmup) return;
             LiveMatch.Match.GetPlayer(player)?.UnReady();
             SendPlayersStatusMessage();
         }
 
         public void End()
         {
+            IsWarmup = false;
             ReadyNotificationTimer?.Kill();
             ReadyNotificationTimer = null;
         }

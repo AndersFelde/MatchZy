@@ -89,9 +89,9 @@ namespace Get5
                 Match.Terrorists.DisconnectPlayer(player);
             }
         }
-        public void GameEndHook(EventGameEnd @event)
+        public void GameEndHook()
         {
-            NextMap();
+            if (IsLive) NextMap();
         }
 
         public void HandlePauseCommand(CCSPlayerController player)
