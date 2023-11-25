@@ -103,6 +103,9 @@ namespace Get5
 
         public void EndWarmup()
         {
+            Match.Team1.GiveTeamTags();
+            Match.Team2.GiveTeamTags();
+
             Warmup.End();
             IsWarmup = false;
             if (MapVote.VoteFinished)

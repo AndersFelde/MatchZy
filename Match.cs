@@ -1,7 +1,14 @@
 
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using System.Text.Json;
+using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Entities;
+using CounterStrikeSharp.API.Modules.Events;
+using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
+using CounterStrikeSharp.API.Modules.Timers;
+using System.Text.Json;
 
 
 namespace Get5
@@ -20,6 +27,8 @@ namespace Get5
             {
                 _CT = value;
                 _CT.CSTeam = CsTeam.CounterTerrorist;
+                Server.ExecuteCommand($"mp_teamname_1 {value.TeamName}");
+                Server.ExecuteCommand($"mp_teamflag_1 {value.TeamFlag}");
             }
         }
 
@@ -31,6 +40,8 @@ namespace Get5
             {
                 _Terrorists = value;
                 _Terrorists.CSTeam = CsTeam.Terrorist;
+                Server.ExecuteCommand($"mp_teamname_2 {value.TeamName}");
+                Server.ExecuteCommand($"mp_teamflag_2 {value.TeamFlag}");
             }
         }
 
@@ -122,6 +133,7 @@ namespace Get5
                 this.CT = this.Team1;
                 this.Terrorists = this.Team2;
             }
+
 
         }
         public static Match LoadFromJson(string match_name)

@@ -90,7 +90,8 @@ namespace Get5
                     readyMsg = "READY";
 
                 }
-                ChatMessage.SendAllChatMessage($"{player.Name} [{readyMsg}]");
+                string playerName = player.PlayerController?.PlayerName ?? player.Name;
+                ChatMessage.SendAllChatMessage($"{playerName} [{readyMsg}]");
 
             }
 
