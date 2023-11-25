@@ -39,10 +39,15 @@ namespace Get5
             LiveMatch.Match.Terrorists.UnReadyPlayers();
             ReadyNotificationTimer = Utils.CreateContinousChatUpdate(SendPlayersStatusMessage, LiveMatch.Get5, seconds: 30);
             IsWarmup = true;
+            Server.ExecuteCommand("exec warmup");
             SendPlayersStatusMessage();
             ChatMessage.SendAllChatMessage("Welcome to the server, we are just warming up");
             ChatMessage.SendAllChatMessage("Send '.ready' to ready");
-            Server.ExecuteCommand("exec prac");
+
+            if (LiveMatch.MapVote.VoteFinished)
+            {
+                ChatMessage.SendAllChatMessage($"Picked maps: {LiveMatch.MapVote.PickedMaps}");
+            }
         }
 
         public void HandleReadyChat(CCSPlayerController player)

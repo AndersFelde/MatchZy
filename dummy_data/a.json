@@ -2,14 +2,18 @@
     "teamName1": "TeamA",
     "teamName2": "TeamB",
     "matchTitle": "TeamA vs TeamB",
-    "numMaps": 1,
+    "numMaps": 2,
     "minPlayersToReady": 1,
     "voteFirst": "random",
     "mapSides": "knife",
     "voteMode": "ban",
     "mapList": [
-        "de_dust2",
+        "de_overpass",
         "de_mirage",
-        "de_inferno"
+        "de_inferno",
+        "de_ancient",
+        "de_anubis",
+        "de_nuke",
+        "de_vertigo"
     ]
 }

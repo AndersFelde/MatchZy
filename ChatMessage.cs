@@ -21,12 +21,12 @@ namespace Get5
 
         public static void SendAllChatMessage(string message)
         {
-            Server.PrintToChatAll($"{Get5.chatPrefix} {message}");
+            Server.PrintToChatAll($"{ChatColors.Green}{Get5.chatPrefix} {message}{ChatColors.Default}");
         }
 
         public static void SendPlayerChatMessage(CCSPlayerController player, string message)
         {
-            player.PrintToChat($"{Get5.chatPrefix} {message}");
+            player.PrintToChat($"{ChatColors.Green}{Get5.chatPrefix} {message}{ChatColors.Green}");
         }
         public static void SendConsoleMessage(string message)
         {

@@ -187,11 +187,11 @@ namespace Get5
         public Team? GetTeam(int teamNum)
         {
 
-            if (Globals.TeamNumLookup[teamNum] == "T")
+            if (Utils.IsTerrorist(teamNum))
             {
                 return this.Terrorists;
             }
-            else if (Globals.TeamNumLookup[teamNum] == "CT")
+            else if (Utils.IsCT(teamNum))
             {
                 return this.CT;
             }

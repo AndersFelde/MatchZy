@@ -21,6 +21,7 @@ namespace Get5
         public MapList BannedMaps { get; set; } = new MapList();
 
         private CounterStrikeSharp.API.Modules.Timers.Timer? VoteUpdateTimer;
+        private CounterStrikeSharp.API.Modules.Timers.Timer? StartGamesTimer;
 
         private bool T_turn = true;
 
@@ -62,7 +63,7 @@ namespace Get5
                 T_turn = true;
             }
 
-            if (LiveMatch.Match.VoteMode == "ban")
+            if (LiveMatch.Match.VoteMode == "ban" || LiveMatch.Match.NumMaps == 1)
             {
                 Is_ban = true;
             }
@@ -92,7 +93,7 @@ namespace Get5
             VoteActive = true;
             ChatMessage.SendAllChatMessage("Map vote started!");
             PrintVoteStatus();
-            VoteUpdateTimer = Utils.CreateContinousChatUpdate(PrintVoteStatus, LiveMatch.Get5, seconds: 30);
+            // VoteUpdateTimer = Utils.CreateContinousChatUpdate(PrintVoteStatus, LiveMatch.Get5, seconds: 30);
             Server.ExecuteCommand("sv_pausable 1");
             Server.ExecuteCommand("pause");
         }
@@ -120,54 +121,65 @@ namespace Get5
         {
             if (!this.VoteFinished)
             {
-                if ((Utils.PlayerIsTerrorist(player) && T_turn == true) || (Utils.PlayerIsCT(player) && T_turn == false))
+                if ((Is_ban && ban) || (!Is_ban && !ban))
                 {
-                    string map = commandArgs[1];
-                    if (AvailableMaps.HasMap(map))
+
+                    if ((Utils.IsTerrorist(player) && T_turn == true) || (Utils.IsCT(player) && T_turn == false))
                     {
-                        // hvis man bare spiller ett map, banner man til ett map er igjen
-                        AvailableMaps.Remove(map);
-                        if (ban || LiveMatch.Match.NumMaps == 1)
+                        string map = commandArgs[1];
+                        if (AvailableMaps.HasMap(map))
                         {
-                            BannedMaps.Add(map);
+                            // hvis man bare spiller ett map, banner man til ett map er igjen
+                            AvailableMaps.Remove(map);
+                            if (ban)
+                            {
+                                BannedMaps.Add(map);
+                            }
+                            else
+                            {
+                                PickedMaps.Add(map);
+                            }
+                            FlipVoteTurn();
+
+                            vote_counter++;
+                            if (vote_counter == 2 && LiveMatch.Match.NumMaps != 1)
+                            {
+                                FlipVoteMode();
+                            }
+
+                            if (AvailableMaps.Count() + PickedMaps.Count() == LiveMatch.Match.NumMaps)
+                            {
+                                PickedMaps.Append(AvailableMaps);
+                            }
+
+                            if (PickedMaps.Count() == LiveMatch.Match.NumMaps)
+                            {
+                                VoteFinished = true;
+                                StartGamesTimer = Utils.CreateDelayedCommand(LiveMatch.EndMapVote, LiveMatch.Get5, seconds: 20);
+                                ChatMessage.SendAllChatMessage("Vote is finished!");
+                                ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
+                                ChatMessage.SendAllChatMessage(".maps to see picked maps");
+                                return;
+                            }
+
+                            PrintVoteStatus();
+
                         }
                         else
                         {
-                            PickedMaps.Add(map);
+                            ChatMessage.SendPlayerChatMessage(player, "Map not available!");
                         }
-                        FlipVoteTurn();
-
-                        vote_counter++;
-                        if (vote_counter == 2)
-                        {
-                            FlipVoteMode();
-                        }
-
-                        if (AvailableMaps.Count() + PickedMaps.Count() == LiveMatch.Match.NumMaps)
-                        {
-                            PickedMaps.Append(AvailableMaps);
-                        }
-
-                        if (PickedMaps.Count() == LiveMatch.Match.NumMaps)
-                        {
-                            VoteFinished = true;
-                            ChatMessage.SendAllChatMessage("Vote is finished!");
-                            LiveMatch.EndMapVote();
-                            return;
-                        }
-
-                        PrintVoteStatus();
 
                     }
                     else
                     {
-                        ChatMessage.SendPlayerChatMessage(player, "Map not available!");
+                        ChatMessage.SendPlayerChatMessage(player, "Not your turn!");
                     }
-
                 }
                 else
                 {
-                    ChatMessage.SendPlayerChatMessage(player, "Not your turn!");
+                    ChatMessage.SendPlayerChatMessage(player, "Wrong mode!");
+
                 }
             }
             else
@@ -176,6 +188,11 @@ namespace Get5
                 ChatMessage.SendPlayerChatMessage(player, "Vote is finished!");
             }
 
+        }
+
+        public void HandleMapsCommand(CCSPlayerController player)
+        {
+            ChatMessage.SendAllChatMessage($"Picked maps: {PickedMaps}");
         }
         private void FlipVoteMode()
         {
@@ -190,8 +207,12 @@ namespace Get5
 
         public void End()
         {
+            StartGamesTimer?.Kill();
+            StartGamesTimer = null;
+
             VoteUpdateTimer?.Kill();
             VoteUpdateTimer = null;
+
             VoteActive = false;
             VoteFinished = true;
             Server.ExecuteCommand("unpause");

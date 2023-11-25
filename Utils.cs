@@ -7,15 +7,19 @@ using CounterStrikeSharp.API.Modules.Events;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Timers;
+using System.Net.NetworkInformation;
+using CounterStrikeSharp.API.Modules.Cvars;
 
 namespace Get5
 {
     class Globals
     {
 
-        static public Dictionary<int, string> TeamNumLookup = new Dictionary<int, string>{
-        {2, "T"},
-        { 3, "CT" },
+        static public Dictionary<int, CsTeam> TeamNumLookup = new Dictionary<int, CsTeam>{
+        {0, CsTeam.None},
+        {1, CsTeam.Spectator},
+        {2, CsTeam.Terrorist},
+        {3, CsTeam.CounterTerrorist },
 
     };
         public static string ConfigPath = Path.Join(Server.GameDirectory + "/csgo/cfg/get5/");
@@ -55,13 +59,21 @@ namespace Get5
     }
     class Utils
     {
-        static public bool PlayerIsTerrorist(CCSPlayerController player)
+        static public bool IsTerrorist(CCSPlayerController player)
         {
-            return Globals.TeamNumLookup[player.TeamNum] == "T";
+            return Globals.TeamNumLookup[player.TeamNum] == CsTeam.Terrorist;
         }
-        static public bool PlayerIsCT(CCSPlayerController player)
+        static public bool IsTerrorist(int teamNum)
         {
-            return Globals.TeamNumLookup[player.TeamNum] == "CT";
+            return Globals.TeamNumLookup[teamNum] == CsTeam.Terrorist;
+        }
+        static public bool IsCT(CCSPlayerController player)
+        {
+            return Globals.TeamNumLookup[player.TeamNum] == CsTeam.CounterTerrorist;
+        }
+        static public bool IsCT(int teamNum)
+        {
+            return Globals.TeamNumLookup[teamNum] == CsTeam.CounterTerrorist;
         }
         public static void Log(string message)
         {
@@ -79,5 +91,40 @@ namespace Get5
             return get5.AddTimer(seconds, callback, TimerFlags.REPEAT);
         }
 
+        public static CounterStrikeSharp.API.Modules.Timers.Timer CreateDelayedCommand(Action callback, Get5 get5, int seconds = 20)
+        {
+            return get5.AddTimer(seconds, callback, TimerFlags.REPEAT);
+        }
+
+        public static bool IsTeamSwapRequired()
+        {
+            // Handling OTs and side swaps (Referred from Get5)
+            var gameRules = Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules!;
+            int roundsPlayed = gameRules.TotalRoundsPlayed;
+
+            int roundsPerHalf = ConVar.Find("mp_maxrounds").GetPrimitiveValue<int>() / 2;
+            int roundsPerOTHalf = ConVar.Find("mp_overtime_maxrounds").GetPrimitiveValue<int>() / 2;
+
+            bool halftimeEnabled = ConVar.Find("mp_halftime").GetPrimitiveValue<bool>();
+
+            if (halftimeEnabled)
+            {
+                if (roundsPlayed == roundsPerHalf)
+                {
+                    return true;
+                }
+                // Now in OT.
+                if (roundsPlayed >= 2 * roundsPerHalf)
+                {
+                    int otround = roundsPlayed - 2 * roundsPerHalf;  // round 33 -> round 3, etc.
+                    // Do side swaps at OT halves (rounds 3, 9, ...)
+                    if ((otround + roundsPerOTHalf) % (2 * roundsPerOTHalf) == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }

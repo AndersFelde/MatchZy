@@ -16,6 +16,8 @@ namespace Get5
     public partial class LiveMatch
     {
 
+        private CounterStrikeSharp.API.Modules.Timers.Timer? NextMatchTimer;
+
         public void ScoreUpdateHook(EventTeamScore @event)
         {
             if (IsLive)
@@ -23,6 +25,24 @@ namespace Get5
                 Match.GetTeam(@event.Teamid)?.UpdateScore(@event.Score);
             }
         }
+
+        public void RoundEndHook(EventRoundEnd @event)
+        {
+            if (IsLive)
+            {
+                Match.GetTeam(@event.Winner).Score++;
+                if (Utils.IsTeamSwapRequired())
+                {
+                    ChatMessage.SendAllChatMessage("Halftime");
+                    ChatMessage.SendAllChatMessage("Halftime");
+                    ChatMessage.SendAllChatMessage("Halftime");
+                    ChatMessage.SendAllChatMessage("Halftime");
+                    (Match.Terrorists, Match.CT) = (Match.CT, Match.Terrorists);
+                }
+            }
+        }
+
+
 
         public void RoundEndHook(EventCsWinPanelRound @event)
         {
@@ -91,7 +111,18 @@ namespace Get5
         }
         public void GameEndHook()
         {
-            if (IsLive) NextMap();
+            if (IsLive)
+            {
+                if (Match.Team1.Score > Match.Team2.Score)
+                {
+                    Match.Team1.WonGames++;
+                }
+                else
+                {
+                    Match.Team2.WonGames++;
+                }
+                NextMatchTimer = Utils.CreateDelayedCommand(NextMap, Get5, seconds: 20);
+            }
         }
 
         public void HandlePauseCommand(CCSPlayerController player)

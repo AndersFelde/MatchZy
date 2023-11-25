@@ -10,6 +10,7 @@ using CounterStrikeSharp.API.Modules.Timers;
 using System.Runtime.CompilerServices;
 using System.Net;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 namespace Get5
 {
     public partial class LiveMatch
@@ -116,6 +117,7 @@ namespace Get5
 
         public void StartMapVote()
         {
+            AssignJoinedPlayers();
             MapVote.Start();
             IsMapVote = true;
         }
@@ -137,6 +139,7 @@ namespace Get5
 
         public void StartKnifeRound()
         {
+            AssignJoinedPlayers();
             if (Match.MapSides == "knife")
             {
                 KnifeRound.Start();
@@ -159,19 +162,44 @@ namespace Get5
 
         public void StartLive()
         {
+            Match.Team1.Score = 0;
+            Match.Team2.Score = 0;
             IsLive = true;
             Server.ExecuteCommand("exec comp");
             Server.ExecuteCommand("exec live");
-            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
-            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
-            ChatMessage.SendAllChatMessage("LIVE LIVE LIVE");
 
+        }
+
+        private Team? DecideWinner()
+        {
+            int roundsPlayed = Match.Team1.WonGames + Match.Team2.WonGames;
+            int roundsLeft = Match.NumMaps - roundsPlayed;
+            int diff = Match.Team1.WonGames - Match.Team2.WonGames;
+
+            if (diff > roundsLeft)
+            {
+                return Match.Team1;
+            }
+            else if (diff < -roundsLeft)
+            {
+                return Match.Team2;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public void NextMap()
         {
-            if (MapVote.PickedMaps.Count() == 0)
+            NextMatchTimer?.Kill();
+            NextMatchTimer = null;
+
+            IsLive = false;
+            Team? winner = DecideWinner();
+            if (winner != null)
             {
+                ChatMessage.SendAllChatMessage($"{winner.TeamName} won the match");
                 EndLive();
                 return;
             }

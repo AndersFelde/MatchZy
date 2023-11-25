@@ -83,6 +83,8 @@ namespace Get5
 
         public int Score = 0;
 
+        public int WonGames = 0;
+
         public List<Player> Players { get; set; } = new List<Player>();
 
         public void Debug()
@@ -94,6 +96,7 @@ namespace Get5
             ChatMessage.SendConsoleMessage($"IsPaused {IsPaused}");
             ChatMessage.SendConsoleMessage($"CSTeam {CSTeam}");
             ChatMessage.SendConsoleMessage($"Score {Score}");
+            ChatMessage.SendConsoleMessage($"WonGames {WonGames}");
             foreach (var player in Players)
             {
                 player.Debug();
@@ -173,7 +176,10 @@ namespace Get5
         public void JoinPlayer(CCSPlayerController player)
         {
             GetPlayer(player.SteamID).PlayerController = player;
-            player.SwitchTeam(CSTeam);
+            if (Globals.TeamNumLookup[player.TeamNum] != CSTeam)
+            {
+                player.SwitchTeam(CSTeam);
+            }
         }
 
         public void DisconnectPlayer(CCSPlayerController player)

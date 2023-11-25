@@ -33,6 +33,7 @@ namespace Get5
                 { "unready", (player, commandArgs, liveMatch) => liveMatch.Warmup.HandleUnReadyChat(player) },
                 { "pause", (player, commandArgs, liveMatch) => liveMatch.HandlePauseCommand(player) },
                 { "unpause", (player, commandArgs, liveMatch) => liveMatch.HandleUnPauseCommand(player) },
+                { "maps", (player, commandArgs, liveMatch) => liveMatch.MapVote.HandleMapsCommand(player) },
                 { "help", (player, commandArgs, liveMatch) => PrintHelp() },
             };
 

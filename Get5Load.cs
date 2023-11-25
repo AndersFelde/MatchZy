@@ -56,14 +56,13 @@ namespace Get5
                 LiveMatch?.PlayerDisconnectHook(@event.Userid);
                 return HookResult.Continue;
             });
-
-            // TODO: Se på trigger for game end
-            RegisterListener<Listeners.OnMapEnd>(() =>
+            RegisterEventHandler<EventCsWinPanelMatch>((@event, info) =>
             {
-                // if (LiveMatch != null) return HookResult.Continue;
+                //To fix player not beeing passed in chat event
                 LiveMatch?.GameEndHook();
-                // return HookResult.Continue;
+                return HookResult.Continue;
             });
+
 
             RegisterEventHandler<EventPlayerDisconnect>((@event, info) =>
             {
@@ -77,12 +76,21 @@ namespace Get5
                 return HookResult.Continue;
             });
 
+            RegisterEventHandler<EventRoundEnd>((@event, info) =>
+            {
+                if (LiveMatch == null) return HookResult.Continue;
+                LiveMatch?.RoundEndHook(@event);
+                return HookResult.Continue;
+            }, HookMode.Post);
+
             RegisterEventHandler<EventCsWinPanelRound>((@event, info) =>
             {
                 if (LiveMatch == null) return HookResult.Continue;
                 LiveMatch?.RoundEndHook(@event);
                 return HookResult.Continue;
             }, HookMode.Pre);
+
+
 
             RegisterEventHandler<EventPlayerChat>((@event, info) =>
                 {
@@ -116,7 +124,7 @@ namespace Get5
                     }
 
                     return HookResult.Continue;
-                });
+                }, HookMode.Post);
 
             RegisterEventHandler<EventPlayerHurt>((@event, info) =>
             {

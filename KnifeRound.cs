@@ -30,7 +30,6 @@ namespace Get5
 
         public void Start()
         {
-            ChatMessage.SendAllChatMessage("Knife round is starting!");
             KnifeActive = true;
             Server.ExecuteCommand("exec comp");
             Server.ExecuteCommand("exec knife");
@@ -114,7 +113,7 @@ namespace Get5
         {
             if (KnifeActive)
             {
-                if ((Utils.PlayerIsTerrorist(player) && T_won) || (Utils.PlayerIsCT(player) && CT_won))
+                if ((Utils.IsTerrorist(player) && T_won) || (Utils.IsCT(player) && CT_won))
                 {
                     string winner;
                     if (T_won)
