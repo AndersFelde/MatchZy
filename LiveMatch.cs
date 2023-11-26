@@ -23,6 +23,8 @@ namespace Get5
 
         private bool IsMapVote = false;
 
+        //fordi den bugger seg når man kjører warmup mens man tar neste map
+        private CounterStrikeSharp.API.Modules.Timers.Timer? DelayedWarmupTmier;
 
 
         public Get5 Get5 { get; set; }
@@ -96,6 +98,8 @@ namespace Get5
 
         public void StartWarmup()
         {
+            DelayedWarmupTmier?.Kill();
+            DelayedWarmupTmier = null;
             AssignJoinedPlayers();
             Warmup.Start();
             IsWarmup = true;
@@ -137,7 +141,7 @@ namespace Get5
             MapVote.End();
             IsMapVote = false;
             ChangeToNextMap();
-            StartWarmup();
+            DelayedWarmupTmier = Utils.CreateDelayedCommand(StartWarmup, Get5, seconds: 20);
         }
 
         public void StartKnifeRound()
