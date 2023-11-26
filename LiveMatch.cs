@@ -134,6 +134,7 @@ namespace Get5
             string map = MapVote.PickedMaps.maps[0];
             MapVote.PickedMaps.RemoveAt(0);
             Server.ExecuteCommand($"changelevel {map}");
+            DelayedWarmupTmier = Utils.CreateDelayedCommand(StartWarmup, Get5, seconds: 15);
         }
 
         public void EndMapVote()
@@ -141,7 +142,6 @@ namespace Get5
             MapVote.End();
             IsMapVote = false;
             ChangeToNextMap();
-            DelayedWarmupTmier = Utils.CreateDelayedCommand(StartWarmup, Get5, seconds: 20);
         }
 
         public void StartKnifeRound()
@@ -212,7 +212,6 @@ namespace Get5
             }
 
             ChangeToNextMap();
-            StartWarmup();
         }
         public void EndLive()
         {
